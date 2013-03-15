@@ -3,8 +3,7 @@ package com.db.exporter.utils;
 import org.apache.log4j.Logger;
 
 /**
- * This is an utility class which has a methods for converting binary data to
- * the hex String. 
+ * Utility class: Provides methods for hexadecimal operations.
  *
  */
 public class HexUtils {

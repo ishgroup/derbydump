@@ -1,6 +1,6 @@
 package com.db.exporter.main;
 
-import com.db.exporter.reader.impl.DatabaseReader;
+import com.db.exporter.writer.DatabaseReader;
 import com.db.exporter.writer.FileWriter;
 
 

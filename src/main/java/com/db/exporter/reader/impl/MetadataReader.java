@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -14,10 +13,9 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.db.exporter.beans.Column;
+import com.db.exporter.beans.Database;
 import com.db.exporter.beans.MetaDataColumnDescriptor;
 import com.db.exporter.beans.Table;
-
-import com.db.exporter.beans.Database;
 
 public class MetadataReader {
     

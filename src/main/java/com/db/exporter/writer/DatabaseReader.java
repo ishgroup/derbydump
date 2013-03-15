@@ -1,4 +1,4 @@
-package com.db.exporter.reader.impl;
+package com.db.exporter.writer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,18 +22,14 @@ import com.db.exporter.beans.Database;
 import com.db.exporter.beans.Table;
 import com.db.exporter.config.Configuration;
 import com.db.exporter.reader.IDatabaseReader;
+import com.db.exporter.reader.impl.MetadataReader;
 import com.db.exporter.utils.DBConnectionManager;
 import com.db.exporter.utils.HexUtils;
 import com.db.exporter.utils.StringUtils;
-import com.db.exporter.writer.BufferManager;
-import com.db.exporter.writer.IBuffer;
 
 /**
- * This class implements {@link IDatabaseReader} and encapsulates methods for
- * reading data present inside the derby database.
- * 
- * @author Abhijeet
- * 
+ * Logical module representing a reader which reads from a database and writes
+ * to a buffer.
  */
 public class DatabaseReader implements IDatabaseReader, Runnable {
 
@@ -47,9 +43,6 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 		m_schema = Configuration.getConfiguration().getSchemaName();
 	}
 
-	/**
-	 * This method reads data from the derby database
-	 */
 	public void readMetaData(String schema) {
 		// getting the connection
 		Connection connection;
@@ -73,8 +66,8 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 	}
 
 	/**
-	 * This method will read data from every {@link Table} persent in the
-	 * database and add the data to the queue.
+	 * Read data from every {@link Table} present in the database and add it to
+	 * the queue.
 	 * 
 	 * @param tables
 	 * @param connection
@@ -115,9 +108,7 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 						t_flag = true;
 					m_buffer.add("(");
 					for (int c_index = 0; c_index < numOfColumns; c_index++) {
-						boolean flag = false;
 						if (c_index > 0) {
-							flag = true;
 							m_buffer.add(SEPARATOR);
 						}
 						Column column = columns.get(c_index);
@@ -223,7 +214,6 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 				}
 			} catch (SQLException e) {
 				LOGGER.error(e.getMessage(), e);
-				System.out.println(e.getCause());
 			} catch (InterruptedException e) {
 				LOGGER.error(DatabaseReader.class.getName()
 						+ ": Interrupted. Exiting.");
@@ -251,11 +241,8 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 	}
 
 	/**
-	 * handles the binary data coming from the database
-	 * 
 	 * @param binaryData
-	 * @param flag
-	 * @return
+	 * @return String representation of binary data
 	 */
 	public String processBinaryData(byte[] binaryData) {
 		if (binaryData == null)
@@ -266,11 +253,8 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 	}
 
 	/**
-	 * handles the {@link Clob} data coming from the database
-	 * 
 	 * @param data
-	 * @param flag
-	 * @return
+	 * @return String representation of Clob.
 	 */
 	public String processClobData(Clob data) {
 		if (data == null)
@@ -296,11 +280,8 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 	}
 
 	/**
-	 * handles the string data coming from the database
-	 * 
 	 * @param data
-	 * @param flag
-	 * @return
+	 * @return String representation of string data after escaping.
 	 */
 	private String processStringData(String data) {
 		if (data == null)
