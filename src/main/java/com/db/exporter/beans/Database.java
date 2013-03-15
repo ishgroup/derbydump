@@ -1,12 +1,13 @@
 package com.db.exporter.beans;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class Database {
 
 	private String databaseName;
-	private List<Table> tables;
+	private List<Table> tables = new ArrayList<Table>();
 	private Map<String, List<String>> dataMap;
 
 	/**
@@ -15,6 +16,14 @@ public class Database {
 	public List<Table> getTables() {
 		return tables;
 	}
+	
+	public void addTable(Table table)
+    {
+        if (table != null)
+        {
+            tables.add(table);
+        }
+    }
 
 	/**
 	 * @param tables the tables to set

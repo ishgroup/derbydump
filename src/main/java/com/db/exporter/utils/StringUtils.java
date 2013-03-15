@@ -1,18 +1,15 @@
 package com.db.exporter.utils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * This class is a utility class which contains method for creating strings with
  * different type of data which is useful in the application.
  * 
- * @author Abhijeet
- * 
  */
 public class StringUtils {
 
-	static Log logger = LogFactory.getLog(StringUtils.class);
+	static Logger LOGGER = Logger.getLogger(StringUtils.class);
 
 	/**
 	 * This method returns url used for connecting to the derby database.

@@ -1,5 +1,8 @@
 package com.db.exporter.beans;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -15,7 +18,7 @@ public class Table {
 	/**
 	 * List of Columns present in the table.
 	 */
-	private List<Column> columns;
+	private List<Column> columns = new ArrayList<Column>();
 	/**
 	 * Name of the table in the database.
 	 */
@@ -88,5 +91,54 @@ public class Table {
 	public void setNumOfRows(int numOfRows) {
 		this.numOfRows = numOfRows;
 	}
+	
+	/**
+     * Adds the given column.
+     * 
+     * @param column The column
+     */
+    public void addColumn(Column column)
+    {
+        if (column != null)
+        {
+            columns.add(column);
+        }
+    }
+    
+    public void addColumn(int idx, Column column)
+    {
+        if (column != null)
+        {
+            columns.add(idx, column);
+        }
+    }
+    
+    public void addColumn(Column previousColumn, Column column)
+    {
+        if (column != null)
+        {
+            if (previousColumn == null)
+            {
+                columns.add(0, column);
+            }
+            else
+            {
+                columns.add(columns.indexOf(previousColumn), column);
+            }
+        }
+    }
+	
+	/**
+     * Adds the given columns.
+     * 
+     * @param columns The columns
+     */
+    public void addColumns(Collection columns)
+    {
+        for (Iterator it = columns.iterator(); it.hasNext();)
+        {
+            addColumn((Column)it.next());
+        }
+    }
 
 }

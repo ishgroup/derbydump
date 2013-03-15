@@ -1,8 +1,5 @@
 package com.db.exporter.reader;
 
-
-public interface DerbyDBReader {
-	
+public interface IDatabaseReader {	
 	public void readMetaData();
-
 }

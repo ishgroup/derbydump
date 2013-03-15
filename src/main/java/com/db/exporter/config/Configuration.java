@@ -1,129 +1,60 @@
 package com.db.exporter.config;
 
-import com.db.exporter.writer.QueueManager;
+import java.util.Properties;
 
 /**
- * This class is designed and responsible for holding all the details which is
- * necessary for the configuration of the application.
- * 
- * @author Abhijeet
+ * Singleton: Loads relevant settings from properties file.
  * 
  */
 public class Configuration {
-	/**
-	 * User name for the derby database
-	 */
-	private String userName;
-	/**
-	 * User password for the derby database
-	 */
-	private String password;
-	/**
-	 * driver name for derby database
-	 */
-	private String driverName;
-	/**
-	 * Path of the folder containing derby database file system
-	 */
-	private String derbyDbPath;
-	/**
-	 * Maximum size of the queue used in {@link QueueManager}.
-	 */
-	private int queueMaxSize;
-	/**
-	 * Path of the file in which application will write(or dump) data for Mysql
-	 * database usage.
-	 */
-	private String dumpFilePath;
 
-	/**
-	 * @return the userName
-	 */
+	private static Configuration m_this;
+
+	private String m_userName;
+	private String m_password;
+	private String m_driverClassName;
+	private String m_derbyDbPath;
+	private int m_bufferMaxSize;
+	private String m_dumpFilePath;
+
+	private Configuration() {
+		Properties prop = PropertyLoader.loadProperties("dump");
+		m_userName = prop.getProperty("db.userName");
+		m_password = prop.getProperty("db.password");
+		m_derbyDbPath = prop.getProperty("db.derbyDbPath");
+		m_driverClassName = prop.getProperty("db.driverClassName");
+		m_bufferMaxSize = Integer.valueOf(prop.getProperty("dump.buffer.size"));
+		m_dumpFilePath = prop.getProperty("dump.buffer.dumpPath");
+	}
+
+	public static synchronized Configuration getConfiguration() {
+		if (m_this == null) {
+			m_this = new Configuration();
+		}
+		return m_this;
+	}
+
 	public String getUserName() {
-		return userName;
+		return m_userName;
 	}
 
-	/**
-	 * @param userName
-	 *            the userName to set
-	 */
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	/**
-	 * @return the password
-	 */
 	public String getPassword() {
-		return password;
+		return m_password;
 	}
 
-	/**
-	 * @param password
-	 *            the password to set
-	 */
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	/**
-	 * @return the derbyDbPath
-	 */
 	public String getDerbyDbPath() {
-		return derbyDbPath;
+		return m_derbyDbPath;
 	}
 
-	/**
-	 * @param derbyDbPath
-	 *            the derbyDbPath to set
-	 */
-	public void setDerbyDbPath(String derbyDbPath) {
-		this.derbyDbPath = derbyDbPath;
-	}
-
-	/**
-	 * @return the driverName
-	 */
 	public String getDriverName() {
-		return driverName;
+		return m_driverClassName;
 	}
 
-	/**
-	 * @param driverName
-	 *            the driverName to set
-	 */
-	public void setDriverName(String driverName) {
-		this.driverName = driverName;
+	public int maxBufferSize() {
+		return m_bufferMaxSize;
 	}
 
-	/**
-	 * @return the queueMqxSize
-	 */
-	public int getQueueMaxSize() {
-		return queueMaxSize;
-	}
-
-	/**
-	 * @param queueMqxSize
-	 *            the queueMqxSize to set
-	 */
-	public void setQueueMaxSize(int queueMaxSize) {
-		this.queueMaxSize = queueMaxSize;
-	}
-
-	/**
-	 * @return the dumpFilePath
-	 */
 	public String getDumpFilePath() {
-		return dumpFilePath;
+		return m_dumpFilePath;
 	}
-
-	/**
-	 * @param dumpFilePath
-	 *            the dumpFilePath to set
-	 */
-	public void setDumpFilePath(String dumpFilePath) {
-		this.dumpFilePath = dumpFilePath;
-	}
-
 }

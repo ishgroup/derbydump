@@ -4,7 +4,6 @@ package com.db.exporter.beans;
  * This class is an object representation of a single column present in the table. Just like 
  * any column in the database table has certain attributes,i.e. name, data type, etc., this class 
  * also has same attributes.
- * @author Abhijeet
  *
  */
 public class Column {
@@ -16,7 +15,7 @@ public class Column {
 	/**
 	 * Data type of the column
 	 */
-	private String columnDataType;
+	private int columnDataType;
 	/**
 	 * Constraint type of a column(if any).
 	 */
@@ -41,13 +40,13 @@ public class Column {
 	/**
 	 * @return the columnDataType
 	 */
-	public String getColumnDataType() {
+	public int getColumnDataType() {
 		return columnDataType;
 	}
 	/**
 	 * @param columnDataType the columnDataType to set
 	 */
-	public void setColumnDataType(String columnDataType) {
+	public void setColumnDataType(int columnDataType) {
 		this.columnDataType = columnDataType;
 	}
 	/**
@@ -74,7 +73,4 @@ public class Column {
 	public void setJavaClassName(String javaClassName) {
 		this.javaClassName = javaClassName;
 	}
-	
-	
-
 }

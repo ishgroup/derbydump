@@ -1,12 +1,10 @@
 package com.db.exporter.utils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * This is an utility class which has a methods for converting binary data to
  * the hex String. 
- * @author Abhijeet
  *
  */
 public class HexUtils {
@@ -15,7 +13,7 @@ public class HexUtils {
 	static private final int LOOKUPLENGTH = 16;
 	static private byte[] hexNumberTable = new byte[BASELENGTH];
 	static private byte[] lookUpHexAlphabet = new byte[LOOKUPLENGTH];
-	static Log logger = LogFactory.getLog(HexUtils.class);
+	static Logger LOGGER = Logger.getLogger(HexUtils.class);
 	
 	static {
 	      for (int i = 0; i<BASELENGTH; i++ ) {
