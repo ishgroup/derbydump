@@ -37,9 +37,9 @@ public class StringUtils {
 	 * @param tableName
 	 * @return
 	 */
-	public static String getSelectQuery(String tableName) {
+	public static String getSelectQuery(String tableName, String schema) {
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("SELECT * FROM APP.");
+		stringBuilder.append("SELECT * FROM " + schema + ".");
 		stringBuilder.append(tableName);
 		return stringBuilder.toString();
 	}
@@ -51,9 +51,9 @@ public class StringUtils {
 	 * @param tableName
 	 * @return
 	 */
-	public static String getCountQuery(String tableName) {
+	public static String getCountQuery(String tableName, String schema) {
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("SELECT COUNT(*) FROM APP.");
+		stringBuilder.append("SELECT COUNT(*) FROM " + schema + ".");
 		stringBuilder.append(tableName);
 		return stringBuilder.toString();
 	}

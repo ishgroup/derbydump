@@ -14,6 +14,7 @@ public class Configuration {
 	private String m_password;
 	private String m_driverClassName;
 	private String m_derbyDbPath;
+	private String m_schemaName;
 	private int m_bufferMaxSize;
 	private String m_dumpFilePath;
 
@@ -23,6 +24,7 @@ public class Configuration {
 		m_password = prop.getProperty("db.password");
 		m_derbyDbPath = prop.getProperty("db.derbyDbPath");
 		m_driverClassName = prop.getProperty("db.driverClassName");
+		m_schemaName =  prop.getProperty("db.schemaName");
 		m_bufferMaxSize = Integer.valueOf(prop.getProperty("dump.buffer.size"));
 		m_dumpFilePath = prop.getProperty("dump.buffer.dumpPath");
 	}
@@ -50,6 +52,10 @@ public class Configuration {
 		return m_driverClassName;
 	}
 
+	public String getSchemaName() {
+		return m_schemaName;
+	}
+	
 	public int maxBufferSize() {
 		return m_bufferMaxSize;
 	}
