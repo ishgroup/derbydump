@@ -17,11 +17,11 @@ import com.db.exporter.utils.IOUtils;
 public class FileWriter implements Runnable {
 	private static final Logger LOGGER = Logger.getLogger(FileWriter.class);
 	private IBuffer m_buffer;
-	private Configuration configuration;
+	private Configuration m_config;
 
-	public FileWriter() {
-		m_buffer = BufferManager.getBufferInstance();
-		configuration = Configuration.getConfiguration();
+	public FileWriter(Configuration config, IBuffer buffer) {
+		m_buffer = buffer;
+		m_config = config;
 	}
 
 	/**
@@ -34,7 +34,7 @@ public class FileWriter implements Runnable {
 	public void run() {
 		Writer streamWriter = null;
 		try {
-			File file = new File(configuration.getDumpFilePath());
+			File file = new File(m_config.getDumpFilePath());
 			streamWriter = IOUtils.getOutputStream(file);
 			synchronized (BufferManager.BUFFER_TOKEN) {
 				while (!BufferManager.isReadingComplete()) {

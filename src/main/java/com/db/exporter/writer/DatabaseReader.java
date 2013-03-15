@@ -34,13 +34,13 @@ import com.db.exporter.utils.StringUtils;
 public class DatabaseReader implements IDatabaseReader, Runnable {
 
 	private IBuffer m_buffer;
-	private String m_schema;
+	private Configuration m_config;
 	public final static String SEPARATOR = ",";
 	private static final Logger LOGGER = Logger.getLogger(DatabaseReader.class);
 
-	public DatabaseReader() {
-		m_buffer = BufferManager.getBufferInstance();
-		m_schema = Configuration.getConfiguration().getSchemaName();
+	public DatabaseReader(Configuration config, IBuffer buffer) {
+		m_buffer = buffer;
+		m_config = config;
 	}
 
 	public void readMetaData(String schema) {
@@ -293,6 +293,6 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 	}
 
 	public void run() {
-		this.readMetaData(m_schema);
+		this.readMetaData(m_config.getSchemaName());
 	}
 }

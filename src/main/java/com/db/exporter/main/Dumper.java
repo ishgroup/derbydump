@@ -1,5 +1,7 @@
 package com.db.exporter.main;
 
+import com.db.exporter.config.Configuration;
+import com.db.exporter.writer.BufferManager;
 import com.db.exporter.writer.DatabaseReader;
 import com.db.exporter.writer.FileWriter;
 
@@ -21,8 +23,8 @@ public class Dumper {
 			 * After dump has been created the threads will kill themselves.
 			 */
 			
-			Thread reader = new Thread(new DatabaseReader(), "Database_reader");
-			Thread writer = new Thread(new FileWriter(), "File_Writer");
+			Thread reader = new Thread(new DatabaseReader(Configuration.getConfiguration(), BufferManager.getBufferInstance()), "Database_reader");
+			Thread writer = new Thread(new FileWriter(Configuration.getConfiguration(), BufferManager.getBufferInstance()), "File_Writer");
 			
 			reader.start();
 			writer.start();
