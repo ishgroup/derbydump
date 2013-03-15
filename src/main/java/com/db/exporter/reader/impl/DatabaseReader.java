@@ -3,6 +3,7 @@ package com.db.exporter.reader.impl;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.math.BigDecimal;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -109,55 +110,89 @@ public class DatabaseReader implements IDatabaseReader,Runnable {
 					m_buffer.add("(");
 					for (int c_index = 0; c_index < numOfColumns; c_index++) {
 						boolean flag = false;
-						if (c_index > 0)
-							flag = true;
+						if (c_index > 0){
+						    flag = true;
+						    m_buffer.add(SEPARATOR);
+						}
 						Column column = columns.get(c_index);
 						String columnName = column.getColumnName();
 						int columnType = column.getColumnDataType();
 						switch(columnType){
-    						case Types.BINARY :
-    						{
-                                byte[] bytes = resultSet.getBytes(columnName);
-                                m_buffer.add(processBinaryData(bytes, flag));
-                                break;
-                            }
-    						case Types.VARBINARY :
-    						{
-                                byte[] bytes = resultSet.getBytes(columnName);
-                                m_buffer.add(processBinaryData(bytes, flag));
-                                break;
-                            }
-    						case Types.BLOB :
-    						{
-    						    byte[] bytes = resultSet.getBytes(columnName);
-                                m_buffer.add(processBinaryData(bytes, flag));
-                                break;
-    						}
-    						case Types.CLOB :
-    						{
-    						    Clob clob = resultSet.getClob(columnName);
-                                m_buffer.add(processClobData(clob, flag));
-                                break;
-    						}
-    						case Types.VARCHAR :
-    						{
-    						    String stringData = resultSet.getString(columnName);
-                                m_buffer.add(processStringData(stringData, flag));
-                                break;
-    						}
-    						case Types.TIMESTAMP :
-    						{
-    						    String stringData = resultSet.getTimestamp(
-                                        columnName).toString();
-                                m_buffer.add(processStringData(stringData, flag));
-                                break;
-    						}
-						    default :
-						    {
-						        Object object = resultSet.getObject(columnName);
-	                            m_buffer.add((flag?SEPARATOR:"") + object.toString());
-						    }
-						}
+                        case Types.BINARY :
+                        case Types.VARBINARY :
+                        case Types.BLOB :
+                        {
+                            byte[] bytes = resultSet.getBytes(columnName);
+                            m_buffer.add(processBinaryData(bytes));
+                            break;
+                        }
+                        case Types.CLOB :
+                        {
+                            Clob clob = resultSet.getClob(columnName);
+                            m_buffer.add(processClobData(clob));
+                            break;
+                        }
+                        case Types.CHAR :
+                        case Types.LONGNVARCHAR :
+                        case Types.VARCHAR :
+                        {
+                            String stringData = resultSet.getString(columnName);
+                            m_buffer.add(processStringData(stringData));
+                            break;
+                        }
+                        case Types.TIME :
+                            String timeData = resultSet.getTime(
+                                    columnName).toString();
+                            m_buffer.add(processStringData(timeData));
+                            break;
+                        case Types.DATE :
+                        {
+                            String dateData = resultSet.getDate(
+                                    columnName).toString();
+                            m_buffer.add(processStringData(dateData));
+                            break;
+                        }
+                        case Types.TIMESTAMP :
+                        {
+                            String stringData = resultSet.getTimestamp(
+                                    columnName).toString();
+                            m_buffer.add(processStringData(stringData));
+                            break;
+                        }
+                        case Types.SMALLINT :
+                            Short shortData = resultSet.getShort(columnName);
+                            m_buffer.add(String.valueOf(shortData));
+                            break;
+                        case Types.BIGINT :
+                            Long longData = resultSet.getLong(columnName);
+                            m_buffer.add(String.valueOf(longData));
+                            break;
+                        case Types.INTEGER :
+                        {
+                            int data = resultSet.getInt(columnName);
+                            m_buffer.add(String.valueOf(data));
+                            break;
+                        }
+                        case Types.NUMERIC :
+                        case Types.DECIMAL :
+                            BigDecimal decimalData = resultSet.getBigDecimal(columnName);
+                            m_buffer.add(String.valueOf(decimalData));
+                            break;
+                        case Types.REAL :
+                        case Types.FLOAT :
+                            Float floatData = resultSet.getFloat(columnName);
+                            m_buffer.add(String.valueOf(floatData));
+                            break;
+                        case Types.DOUBLE :
+                            Double doubleData = resultSet.getDouble(columnName);
+                            m_buffer.add(String.valueOf(doubleData));
+                            break;
+                        default :
+                        {
+                            Object object = resultSet.getObject(columnName);
+                            m_buffer.add(object.toString());
+                        }
+                    }
 					}
 					counter++;
 					if (!t_flag){
@@ -210,10 +245,9 @@ public class DatabaseReader implements IDatabaseReader,Runnable {
 	 * @param flag
 	 * @return
 	 */
-	public String processBinaryData(byte[] binaryData, boolean flag) {
+	public String processBinaryData(byte[] binaryData) {
 		String data = HexUtils.bytesToString(binaryData);
-		if (flag)
-			data = SEPARATOR + " '" + data + "' ";
+		data = "'" + data + "'";
 		return data;
 	}
 
@@ -224,7 +258,7 @@ public class DatabaseReader implements IDatabaseReader,Runnable {
 	 * @param flag
 	 * @return
 	 */
-	public String processClobData(Clob data, boolean flag) {
+	public String processClobData(Clob data) {
 		StringBuilder sb = new StringBuilder();
 		try {
 			Reader reader = data.getCharacterStream();
@@ -241,8 +275,7 @@ public class DatabaseReader implements IDatabaseReader,Runnable {
 			LOGGER.error(e.getMessage(), e);
 		}
 		String result = sb.toString();
-		if (flag)
-			result = SEPARATOR + " '" + result + "'";
+		result = "'" + result + "'";
 		return result;
 	}
 
@@ -253,11 +286,9 @@ public class DatabaseReader implements IDatabaseReader,Runnable {
 	 * @param flag
 	 * @return
 	 */
-	private String processStringData(String data, boolean flag) {
-		if (flag)
-			data = SEPARATOR + " '" + data + "'";
-		else
-			data = "'" + data + "'";
+	private String processStringData(String data) {
+	    data = StringUtils.escapeQuotes(data);
+		data = "'" + data + "'";
 		return data;
 	}
 

@@ -69,5 +69,23 @@ public class StringUtils {
 		stringBuilder.append("UNLOCK TABLES;");
 		return stringBuilder.toString();
 	}
-
+	
+	/**
+	 * This method returns a String escaping quotes by adding another quote for SQL compatibility.
+	 * @param raw
+	 * @return
+	 */
+	public static String escapeQuotes(String raw) {
+        StringBuilder cooked = new StringBuilder();
+        char c;
+        for (int i = 0; i < raw.length(); i++) {
+            c = raw.charAt(i);
+            if (c == '\'') {
+                cooked = cooked.append('\'').append(c);
+            } else {
+                cooked = cooked.append(c);
+            }
+        }
+        return cooked.toString();
+    }
 }
