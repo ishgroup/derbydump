@@ -247,7 +247,7 @@ public class DatabaseReader implements IDatabaseReader,Runnable {
 	 */
 	public String processBinaryData(byte[] binaryData) {
 		String data = HexUtils.bytesToString(binaryData);
-		data = "'" + data + "'";
+		data = "'0x" + data + "'";
 		return data;
 	}
 
