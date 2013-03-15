@@ -28,7 +28,7 @@ import com.db.exporter.utils.HexUtils;
 import com.db.exporter.utils.StringUtils;
 
 /**
- * Logical module representing a reader which reads from a database and writes
+ * Logical module representing a reader/producer which reads from a database and writes
  * to a buffer.
  */
 public class DatabaseReader implements IDatabaseReader, Runnable {
@@ -216,20 +216,20 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 				LOGGER.error(e.getMessage(), e);
 			} catch (InterruptedException e) {
 				LOGGER.error(DatabaseReader.class.getName()
-						+ ": Interrupted. Exiting.");
+						+ ": Database Reader interrupted - exiting.");
 				return;
 			} finally {
 				if (resultSet != null)
 					try {
 						resultSet.close();
 					} catch (SQLException e1) {
-						LOGGER.error(e1.getMessage(), e1);
+						LOGGER.error(e1.getErrorCode() + ": Could not close the resultset: " + e1.getMessage());
 					}
 				if (statement != null)
 					try {
 						statement.close();
 					} catch (SQLException e) {
-						LOGGER.error(e.getMessage(), e);
+						LOGGER.error(e.getErrorCode() + ": Could not close the statement: " + e.getMessage());
 					}
 			}
 		}
