@@ -1,9 +1,7 @@
 package com.db.exporter.beans;
 
 /**
- * This class is an object representation of a single column present in the table. Just like 
- * any column in the database table has certain attributes,i.e. name, data type, etc., this class 
- * also has same attributes.
+ * Represents a column in a database table.
  *
  */
 public class Column {

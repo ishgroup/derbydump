@@ -7,23 +7,20 @@ import java.io.Writer;
 
 import com.db.exporter.writer.IBuffer;
 
-
 /**
- * This is a utility class which provides a method for writing content on the file. This method
- * will add data to the already present data in the file.
- *
+ * Utility class: Provides methods for disk IO.
+ * 
  */
 public class IOUtils {
-	
-	public static void write(Writer writer, IBuffer buffer) throws IOException{
+
+	public static void write(Writer writer, IBuffer buffer) throws IOException {
 		writer.append(buffer.flush());
 	}
 
 	public static Writer getOutputStream(File file) throws IOException {
-		if(!file.exists()){
-            file.createNewFile();
+		if (!file.exists()) {
+			file.createNewFile();
 		}
 		return new FileWriter(file);
 	}
-	
 }

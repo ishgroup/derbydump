@@ -6,11 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * This bean is an object representation of single table which is present in the
- * database.Just like any database table has certain attributes,i.e.name, columns,etc
- * this bean also has attributes.
- * 
- * @author Abhijeet
+ * Represents a database table.
  * 
  */
 public class Table {
@@ -91,54 +87,45 @@ public class Table {
 	public void setNumOfRows(int numOfRows) {
 		this.numOfRows = numOfRows;
 	}
-	
+
 	/**
-     * Adds the given column.
-     * 
-     * @param column The column
-     */
-    public void addColumn(Column column)
-    {
-        if (column != null)
-        {
-            columns.add(column);
-        }
-    }
-    
-    public void addColumn(int idx, Column column)
-    {
-        if (column != null)
-        {
-            columns.add(idx, column);
-        }
-    }
-    
-    public void addColumn(Column previousColumn, Column column)
-    {
-        if (column != null)
-        {
-            if (previousColumn == null)
-            {
-                columns.add(0, column);
-            }
-            else
-            {
-                columns.add(columns.indexOf(previousColumn), column);
-            }
-        }
-    }
-	
+	 * Adds the given column.
+	 * 
+	 * @param column
+	 *            The column
+	 */
+	public void addColumn(Column column) {
+		if (column != null) {
+			columns.add(column);
+		}
+	}
+
+	public void addColumn(int idx, Column column) {
+		if (column != null) {
+			columns.add(idx, column);
+		}
+	}
+
+	public void addColumn(Column previousColumn, Column column) {
+		if (column != null) {
+			if (previousColumn == null) {
+				columns.add(0, column);
+			} else {
+				columns.add(columns.indexOf(previousColumn), column);
+			}
+		}
+	}
+
 	/**
-     * Adds the given columns.
-     * 
-     * @param columns The columns
-     */
-    public void addColumns(Collection columns)
-    {
-        for (Iterator it = columns.iterator(); it.hasNext();)
-        {
-            addColumn((Column)it.next());
-        }
-    }
+	 * Adds the given columns.
+	 * 
+	 * @param columns
+	 *            The columns
+	 */
+	public void addColumns(Collection columns) {
+		for (Iterator it = columns.iterator(); it.hasNext();) {
+			addColumn((Column) it.next());
+		}
+	}
 
 }

@@ -1,19 +1,17 @@
 package com.db.exporter.writer;
 
 import java.io.IOException;
-import java.util.concurrent.ArrayBlockingQueue;
 
 import com.db.exporter.config.Configuration;
 
 /**
- * This class is responsible for the management of data and queue
- * {@link ArrayBlockingQueue}. It has methods for adding and removing elements
- * from the queue.
+ * Singleton: Encapsulates the buffer used for reading and writing.
  * 
  */
 public class BufferManager {
 
-	public static final Object BUFFER_TOKEN = new Object();
+	/*Token for buffer access*/
+	protected static final Object BUFFER_TOKEN = new Object();
 	private static volatile boolean g_isReadingComplete = false;
 	private static IBuffer m_buffer;
 
@@ -21,6 +19,9 @@ public class BufferManager {
 	private BufferManager() {
 	}
 
+	/**
+	 * @return Instance of an {@link IBuffer}
+	 */
 	public static synchronized IBuffer getBufferInstance() {
 		if (m_buffer == null) {
 			m_buffer = new StringBuilderAsBuffer();
@@ -29,7 +30,7 @@ public class BufferManager {
 	}
 
 	/**
-	 * @return the isReadingComplete
+	 * @return Returns reader thread's status.
 	 */
 	public static boolean isReadingComplete() {
 		return g_isReadingComplete;
@@ -39,11 +40,14 @@ public class BufferManager {
 	 * @param isReadingComplete
 	 *            the isReadingComplete to set
 	 */
-	public static void setReadingComplete(boolean isReadingComplete) {
+	protected static void setReadingComplete(boolean isReadingComplete) {
 		g_isReadingComplete = isReadingComplete;
 	}
 }
 
+/**
+ * IBuffer using StringBuilder as the underlying buffer implementation.
+ */
 class StringBuilderAsBuffer implements IBuffer {
 
 	StringBuilder m_buffer;

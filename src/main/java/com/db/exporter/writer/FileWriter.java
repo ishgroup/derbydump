@@ -11,11 +11,8 @@ import com.db.exporter.main.Dumper;
 import com.db.exporter.utils.IOUtils;
 
 /**
- * This class encapsulates a thread which is responsible for picking data
- * element from the queue( refer {@link BufferManager} and write to the file
- * which will eventually used by a mysqldump application for reloading data into
- * mysql database.
- * 
+ * Logical module representing a writer/consumer which flushes the buffer and
+ * writes to a stream.
  */
 public class FileWriter implements Runnable {
 	private static final Logger LOGGER = Logger.getLogger(FileWriter.class);
@@ -28,40 +25,45 @@ public class FileWriter implements Runnable {
 	}
 
 	/**
-	 * Main body of the thread. Here, data element is getting removed from queue
-	 * and eventually written on the file
+	 * Writing logic.
+	 * 
+	 * Until Reader is completely done, keep flushing and writing the buffer to
+	 * a specified file.
+	 * 
 	 */
 	public void run() {
 		Writer streamWriter = null;
 		try {
 			File file = new File(configuration.getDumpFilePath());
-			streamWriter =  IOUtils.getOutputStream(file);
+			streamWriter = IOUtils.getOutputStream(file);
 			synchronized (BufferManager.BUFFER_TOKEN) {
 				while (!BufferManager.isReadingComplete()) {
-						if (!Thread.interrupted()) {
-							try {
-								BufferManager.BUFFER_TOKEN.wait();
-							} catch (InterruptedException e) {
-								LOGGER.info("Reader interrupted. Killing writer.");
-								return;
-							}
-							// writing the data to the file
+					if (!Thread.interrupted()) {
+						try {
+							BufferManager.BUFFER_TOKEN.wait();
+						} catch (InterruptedException e) {
+							LOGGER.info("Reader interrupted. Killing writer.");
+							return;
+						}
+						// writing the data to the file
 						if (m_buffer.size() == 0) {
 							break;
 						}
-							IOUtils.write(streamWriter, m_buffer);
-							streamWriter.flush();
-							BufferManager.BUFFER_TOKEN.notify();
-						}
+						IOUtils.write(streamWriter, m_buffer);
+						streamWriter.flush();
+						BufferManager.BUFFER_TOKEN.notify();
 					}
 				}
-			System.out.println("TotalTime::"+(System.currentTimeMillis() - Dumper.startTime)/1000);
+			}
+			System.out.println("TotalTime::"
+					+ (System.currentTimeMillis() - Dumper.startTime) / 1000);
 		} catch (IOException e) {
-		} finally{
+		} finally {
 			try {
 				streamWriter.close();
 			} catch (IOException e) {
-				LOGGER.error(e.getMessage());
+				LOGGER.error("Could not close the stream writer: "
+						+ e.getMessage());
 			}
 		}
 	}

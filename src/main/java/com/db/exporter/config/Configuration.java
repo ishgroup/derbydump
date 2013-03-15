@@ -3,7 +3,7 @@ package com.db.exporter.config;
 import java.util.Properties;
 
 /**
- * Singleton: Loads relevant settings from properties file.
+ * Singleton: Loads relevant application settings from properties file.
  * 
  */
 public class Configuration {
@@ -24,7 +24,7 @@ public class Configuration {
 		m_password = prop.getProperty("db.password");
 		m_derbyDbPath = prop.getProperty("db.derbyDbPath");
 		m_driverClassName = prop.getProperty("db.driverClassName");
-		m_schemaName =  prop.getProperty("db.schemaName");
+		m_schemaName = prop.getProperty("db.schemaName");
 		m_bufferMaxSize = Integer.valueOf(prop.getProperty("dump.buffer.size"));
 		m_dumpFilePath = prop.getProperty("dump.buffer.dumpPath");
 	}
@@ -36,30 +36,52 @@ public class Configuration {
 		return m_this;
 	}
 
+	/**
+	 * @return Database userName
+	 */
 	public String getUserName() {
 		return m_userName;
 	}
 
+	/**
+	 * @return Database password
+	 */
 	public String getPassword() {
 		return m_password;
 	}
 
+	/**
+	 * @return Absolute path to the database
+	 */
 	public String getDerbyDbPath() {
 		return m_derbyDbPath;
 	}
 
+	/**
+	 * @return JDBC driver name
+	 */
 	public String getDriverName() {
 		return m_driverClassName;
 	}
 
+	/**
+	 * @return Database schema name
+	 */
 	public String getSchemaName() {
 		return m_schemaName;
 	}
-	
+
+	/**
+	 * @return Maximum intermediate buffer size. Should atleast be long enough
+	 *         to hold the longest row. Impacts performance.
+	 */
 	public int maxBufferSize() {
 		return m_bufferMaxSize;
 	}
 
+	/**
+	 * @return Absolute target location for the dump file.
+	 */
 	public String getDumpFilePath() {
 		return m_dumpFilePath;
 	}
