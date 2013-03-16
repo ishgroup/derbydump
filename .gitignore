@@ -11,3 +11,4 @@ derby.log
 
 # IntelliJ
 *.iml
+.idea
