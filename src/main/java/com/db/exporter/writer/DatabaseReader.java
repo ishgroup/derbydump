@@ -105,20 +105,6 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 								+ "\n");
 						m_buffer.add("INSERT INTO " + tableName + " ");
 						for (int c_index = 0; c_index < numOfColumns; c_index++) {
-							// String columnName =
-							// columns.get(c_index).getColumnName();
-							if (c_index == 0) {
-								m_buffer.add("(");
-							}
-							m_buffer.add(columns.get(c_index).getColumnName());
-							if (c_index == numOfColumns - 1) {
-								m_buffer.add(") VALUES \n");
-							} else {
-								m_buffer.add(", ");
-							}
-						}
-						m_buffer.add("INSERT INTO " + tableName + " ");
-						for (int c_index = 0; c_index < numOfColumns; c_index++) {
 						    //String columnName = columns.get(c_index).getColumnName();
 						    if(c_index == 0){
 						        m_buffer.add("(");
