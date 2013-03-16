@@ -24,21 +24,30 @@ public class DBConnectionManager {
 	 * @throws SQLException
 	 */
 	public static synchronized Connection getConnection() throws SQLException {
+		return getConnection(StringUtils.getDerbyUrl(Configuration
+				.getConfiguration().getDerbyDbPath(), Configuration
+				.getConfiguration().getUserName(), Configuration
+				.getConfiguration().getPassword()));
+	}
+
+	/**
+	 * @return Database connection
+	 * @throws SQLException
+	 */
+	public static synchronized Connection getConnection(String url)
+			throws SQLException {
 		if (g_this == null) {
 			g_this = new DBConnectionManager();
-		} else if (g_this.createConnection() != null) {
+		} else if (g_this.connection != null) {
 			/* Close existing connection */
 			g_this.connection.close();
 		}
-		g_this.connection = g_this.createConnection();
+		g_this.connection = g_this.createConnection(url);
 
 		return g_this.connection;
 	}
-
-	private Connection createConnection() throws SQLException {
-		String url = StringUtils.getDerbyUrl(Configuration.getConfiguration()
-				.getDerbyDbPath(), Configuration.getConfiguration()
-				.getUserName(), Configuration.getConfiguration().getPassword());
+	
+	private Connection createConnection(String url) throws SQLException {
 		Connection connection = null;
 		try {
 			Class.forName(Configuration.getConfiguration().getDriverName())

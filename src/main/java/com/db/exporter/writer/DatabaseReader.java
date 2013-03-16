@@ -28,8 +28,8 @@ import com.db.exporter.utils.HexUtils;
 import com.db.exporter.utils.StringUtils;
 
 /**
- * Logical module representing a reader/producer which reads from a database and writes
- * to a buffer.
+ * Logical module representing a reader/producer which reads from a database and
+ * writes to a buffer.
  */
 public class DatabaseReader implements IDatabaseReader, Runnable {
 
@@ -47,7 +47,9 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 		// getting the connection
 		Connection connection;
 		try {
-			connection = DBConnectionManager.getConnection();
+			connection = DBConnectionManager.getConnection(StringUtils
+					.getDerbyUrl(m_config.getDerbyDbPath(),
+							m_config.getUserName(), m_config.getPassword()));
 		} catch (SQLException e1) {
 			LOGGER.error("Could not establish Database connection.", e1);
 			return;
@@ -101,6 +103,20 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 					if (counter == 0) {
 						m_buffer.add("LOCK TABLES `" + tableName + "` WRITE;"
 								+ "\n");
+						m_buffer.add("INSERT INTO " + tableName + " ");
+						for (int c_index = 0; c_index < numOfColumns; c_index++) {
+							// String columnName =
+							// columns.get(c_index).getColumnName();
+							if (c_index == 0) {
+								m_buffer.add("(");
+							}
+							m_buffer.add(columns.get(c_index).getColumnName());
+							if (c_index == numOfColumns - 1) {
+								m_buffer.add(") VALUES \n");
+							} else {
+								m_buffer.add(", ");
+							}
+						}
 						m_buffer.add("INSERT INTO " + tableName + " ");
 						for (int c_index = 0; c_index < numOfColumns; c_index++) {
 						    //String columnName = columns.get(c_index).getColumnName();
@@ -236,13 +252,17 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 					try {
 						resultSet.close();
 					} catch (SQLException e1) {
-						LOGGER.error(e1.getErrorCode() + ": Could not close the resultset: " + e1.getMessage());
+						LOGGER.error(e1.getErrorCode()
+								+ ": Could not close the resultset: "
+								+ e1.getMessage());
 					}
 				if (statement != null)
 					try {
 						statement.close();
 					} catch (SQLException e) {
-						LOGGER.error(e.getErrorCode() + ": Could not close the statement: " + e.getMessage());
+						LOGGER.error(e.getErrorCode()
+								+ ": Could not close the statement: "
+								+ e.getMessage());
 					}
 			}
 		}
