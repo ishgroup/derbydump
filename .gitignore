@@ -8,3 +8,6 @@
 /target
 /logs
 derby.log
+
+# IntelliJ
+*.iml
