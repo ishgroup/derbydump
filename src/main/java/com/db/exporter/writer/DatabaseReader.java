@@ -134,14 +134,12 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 						case Types.VARBINARY:
 						case Types.BLOB: {
 							byte[] bytes = resultSet.getBytes(columnName);
-							m_buffer.add(bytes == null ? ""
-									: processBinaryData(bytes));
+							m_buffer.add(bytes == null ? null : processBinaryData(bytes));
 							break;
 						}
 						case Types.CLOB: {
 							Clob clob = resultSet.getClob(columnName);
-							m_buffer.add(clob == null ? ""
-									: processClobData(clob));
+							m_buffer.add(clob == null ? null : processClobData(clob));
 							break;
 						}
 						case Types.CHAR:
