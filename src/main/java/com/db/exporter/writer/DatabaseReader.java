@@ -101,7 +101,20 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 					if (counter == 0) {
 						m_buffer.add("LOCK TABLES `" + tableName + "` WRITE;"
 								+ "\n");
-						m_buffer.add("INSERT INTO " + tableName + " VALUES ");
+						m_buffer.add("INSERT INTO " + tableName + " ");
+						for (int c_index = 0; c_index < numOfColumns; c_index++) {
+						    //String columnName = columns.get(c_index).getColumnName();
+						    if(c_index == 0){
+						        m_buffer.add("(");
+						    }
+						    m_buffer.add(columns.get(c_index).getColumnName());
+						    if(c_index == numOfColumns -1){
+						        m_buffer.add(") VALUES \n");
+						    }
+						    else{
+						        m_buffer.add(", ");
+						    }
+						}
 					}
 					// TODO Logic needs to be refined for end of table data.
 					if (counter == numOfRows - 1)
@@ -275,7 +288,7 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 			LOGGER.error(e.getMessage(), e);
 		}
 		String result = sb.toString();
-		result = "'" + result + "'";
+		result = processStringData(result);
 		return result;
 	}
 
@@ -287,7 +300,7 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 		if (data == null)
 			return null;
 
-		data = StringUtils.escapeQuotes(data);
+		data = StringUtils.escapeQuotes(data.trim());
 		data = "'" + data + "'";
 		return data;
 	}
