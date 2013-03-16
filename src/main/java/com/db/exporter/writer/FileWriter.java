@@ -60,7 +60,11 @@ public class FileWriter implements Runnable {
 		} catch (IOException e) {
 		} finally {
 			try {
-				streamWriter.close();
+				if (streamWriter != null) {
+					streamWriter.close();
+				} else {
+					LOGGER.error("Could not get File stream");
+				}
 			} catch (IOException e) {
 				LOGGER.error("Could not close the stream writer: "
 						+ e.getMessage());
