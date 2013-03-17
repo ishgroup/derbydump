@@ -30,7 +30,7 @@ public class DumpTest {
 	private static final String RESOURCE_DUMP_LOCATION = "./src/test/test.sql";
 	private static final int RESOURCE_MAX_BUFFER_SIZE = 200;
 
-	private static final String GOOD_QUERY = "LOCK TABLES `DUMPERTEST` WRITE;\nINSERT INTO DUMPERTEST (ID, DES, TIME, TYPE, LOCATION, ALERT) VALUES \n(1,'TestData','1970-01-01','TestType',10,10);\nUNLOCK TABLES;";
+	private static final String GOOD_QUERY = "LOCK TABLES `DUMPERTEST` WRITE;\nINSERT INTO DUMPERTEST (ID, DES, TIME, NULLTIME, TYPE, LOCATION, ALERT) VALUES \n(1,'TestData','1970-01-01',null,'漢字',10,10);\nUNLOCK TABLES;";
 
 	private static Connection connection;
 	private static Configuration config;
@@ -49,7 +49,7 @@ public class DumpTest {
 				+ Configuration.getConfiguration().getSchemaName()
 				+ "."
 				+ TABLE_NAME
-				+ "(Id INTEGER NOT NULL,Des VARCHAR(25),Time DATE,Type VARCHAR(25),Location INTEGER,Alert INTEGER)";
+				+ "(Id INTEGER NOT NULL,Des VARCHAR(25),Time DATE,nullTime TIMESTAMP, Type VARCHAR(25),Location INTEGER,Alert INTEGER)";
 
 		Statement statement = connection.createStatement();
 		statement.execute(sql);
@@ -58,13 +58,16 @@ public class DumpTest {
 		Thread.sleep(2000);
 		PreparedStatement ps = connection.prepareStatement("INSERT INTO "
 				+ config.getSchemaName() + "." + TABLE_NAME
-				+ " VALUES (?, ?,?,?,?,?)");
+				+ " VALUES (?,?,?,?,?,?,?)");
 		ps.setInt(1, 1);
 		ps.setString(2, "TestData");
 		ps.setDate(3, new Date(2000));
-		ps.setString(4, "TestType");
-		ps.setInt(5, 10);
+		//Test for null TIMESTAMP
+		ps.setTimestamp(4, null);
+		//The below will make sure that chinese characters e.g. UTF-8 encoded streams are properly read. 
+		ps.setString(5, "漢字");
 		ps.setInt(6, 10);
+		ps.setInt(7, 10);
 		ps.execute();
 		connection.commit();
 		ps.close();
@@ -85,7 +88,7 @@ public class DumpTest {
 
 		StringBuilder sb = new StringBuilder(1000);
 
-		InputStreamReader r = new InputStreamReader(new FileInputStream(file));
+		InputStreamReader r = new InputStreamReader(new FileInputStream(file), "UTF-8");
 		char[] buffer = new char[1024];
 		while ((r.read(buffer, 0, 1024)) > -1) {
 			sb.append(buffer);
@@ -93,7 +96,7 @@ public class DumpTest {
 
 		assertTrue("Error creating dump: ", file.exists() && file.length() > 0);
 		assertTrue("Wrong dump created", sb.toString().contains(GOOD_QUERY));
-
+		r.close();
 	}
 
 	@AfterClass
