@@ -37,6 +37,7 @@ public class DumpTest {
 	@BeforeClass
 	public static void setUp() throws Exception {
 		String url = StringUtils.getDerbyUrl("memory:testdb", "", "");
+		url.replace("create=false", "create=true");
 
 		connection = DBConnectionManager.getConnection(url);
 		config = Configuration.getConfiguration("", "", RESOURCE_DATABASE_PATH,

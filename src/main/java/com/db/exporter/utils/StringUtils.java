@@ -24,6 +24,7 @@ public class StringUtils {
 		stringBuilder.append(";create=true;");
 		stringBuilder.append("user=" + userName + ";");
 		stringBuilder.append("password=" + password + ";");
+		stringBuilder.append("create=false;");
 		String derbyDBUrl = stringBuilder.toString();
 		return derbyDBUrl;
 	}
