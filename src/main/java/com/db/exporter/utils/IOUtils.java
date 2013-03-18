@@ -1,8 +1,9 @@
 package com.db.exporter.utils;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 import com.db.exporter.writer.IBuffer;
@@ -21,6 +22,6 @@ public class IOUtils {
 		if (!file.exists()) {
 			file.createNewFile();
 		}
-		return new FileWriter(file);
+		return new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
 	}
 }
