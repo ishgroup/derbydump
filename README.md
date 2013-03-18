@@ -3,6 +3,19 @@
 
 Derby SQL dump. This project will take a Derby database and export it to a file, suitable for importing to mysql (or probabably some other SQL compliance database).
 
+## Building
+
+Clone the reposiory, then execute 'mvn package' in the main directory.
+
+## Setup
+
+Please create a file called 'dump.properties' in the folder the application will be run from.
+See sample.dump.properties for more information.
+
+## Running
+
+Run application with 'java -jar [pathTo]/exporter-0.0.1-SNAPSHOT-jar-with-dependencies.jar'.
+
 
 ## Continuous integration testing
 
