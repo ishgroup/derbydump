@@ -36,6 +36,7 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 	private IBuffer m_buffer;
 	private Configuration m_config;
 	public final static String SEPARATOR = ",";
+	private final static int MAX_ALLOWED_ROWS = 100; 
 	private static final Logger LOGGER = Logger.getLogger(DatabaseReader.class);
 
 	public DatabaseReader(Configuration config, IBuffer buffer) {
@@ -81,14 +82,15 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 		ResultSet resultSet = null;
 		// Iterating over the list of the tables
 		for (int t_index = 0; t_index < numOfTables; t_index++) {
+		    //Flag for reading end of table
 			boolean t_flag = false;
+			StringBuilder initTableInsert = new StringBuilder();
 			// picking a table at index
 			Table table = tables.get(t_index);
-			// fetching the atributes of the table
+			// fetching the attributes of the table
 			String tableName = table.getTableName();
 			List<Column> columns = table.getColumns();
 			int numOfColumns = columns.size();
-			// int numOfRows = table.getNumOfRows();
 			// constructing the select query
 			String selectQuery = StringUtils.getSelectQuery(tableName, schema);
 			String countQuery = StringUtils.getCountQuery(tableName, schema);
@@ -101,22 +103,22 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 				int counter = 0;
 				while (resultSet.next()) {
 					if (counter == 0) {
-						m_buffer.add("LOCK TABLES `" + tableName + "` WRITE;"
-								+ "\n");
-						m_buffer.add("INSERT INTO " + tableName + " ");
+					    initTableInsert.append("LOCK TABLES `" + tableName + "` WRITE;\n");
+					    initTableInsert.append("INSERT INTO " + tableName + " ");
 						for (int c_index = 0; c_index < numOfColumns; c_index++) {
 						    //String columnName = columns.get(c_index).getColumnName();
 						    if(c_index == 0){
-						        m_buffer.add("(");
+						        initTableInsert.append("(");
 						    }
-						    m_buffer.add(columns.get(c_index).getColumnName());
+						    initTableInsert.append(columns.get(c_index).getColumnName());
 						    if(c_index == numOfColumns -1){
-						        m_buffer.add(") VALUES \n");
+						        initTableInsert.append(") VALUES \n");
 						    }
 						    else{
-						        m_buffer.add(", ");
+						        initTableInsert.append(", ");
 						    }
 						}
+						m_buffer.add(initTableInsert.toString());
 					}
 					// TODO Logic needs to be refined for end of table data.
 					if (counter == numOfRows - 1)
@@ -211,11 +213,17 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 						}
 					}
 					counter++;
-					if (!t_flag) {
+					if (!t_flag && counter%MAX_ALLOWED_ROWS != 0){
 						m_buffer.add("),\n");
-					} else {
+					}
+					else if(!t_flag){
+					    m_buffer.add(");\n").add(
+                                StringUtils.getUnLockStatement(tableName));
+					    m_buffer.add(initTableInsert.toString());
+					}
+					else {
 						m_buffer.add(");\n").add(
-								StringUtils.getUnLockStatement(tableName));
+								StringUtils.getUnLockStatement(tableName)).add("\n");
 					}
 
 					if (m_buffer.isFull()) {
@@ -308,7 +316,7 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 		data = "'" + data + "'";
 		return data;
 	}
-
+	
 	public void run() {
 		this.readMetaData(m_config.getSchemaName());
 	}
