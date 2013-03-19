@@ -1,19 +1,7 @@
 package com.db.exporter.main;
 
-<<<<<<< HEAD
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
-=======
-import com.db.exporter.config.Configuration;
-import com.db.exporter.utils.DBConnectionManager;
-import com.db.exporter.utils.StringUtils;
-import com.db.exporter.writer.BufferManager;
-import com.db.exporter.writer.DatabaseReader;
-import com.db.exporter.writer.FileWriter;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
->>>>>>> 9af178b3858e985dc22107abd3571368e263247b
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,7 +12,6 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 
-<<<<<<< HEAD
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -36,9 +23,6 @@ import com.db.exporter.utils.StringUtils;
 import com.db.exporter.writer.BufferManager;
 import com.db.exporter.writer.DatabaseReader;
 import com.db.exporter.writer.FileWriter;
-=======
-import static junit.framework.Assert.assertTrue;
->>>>>>> 9af178b3858e985dc22107abd3571368e263247b
 
 public class DumpTest {
 
