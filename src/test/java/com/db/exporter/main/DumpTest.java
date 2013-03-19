@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -132,9 +133,9 @@ public class DumpTest {
 	    assertEquals("failure In converting byte to HEX",expected, actual);
 	    String chineseString = "中國全國人大、政協「兩會」綜合報導 Read more:";
 	    String expectedChi = "E4B8ADE59C8BE585A8E59C8BE4BABAE5A4A7E38081E694BFE58D94E3808CE585A9E69C83E3808DE7B69CE59088E5A0B1E5B08E2052656164206D6F72653A";
-	    byte[] bytesChi = chineseString.getBytes();
+	    byte[] bytesChi = chineseString.getBytes(Charset.forName("UTF-8"));
 	    String actualChi = HexUtils.bytesToString(bytesChi);
-	    //assertEquals("failure In converting byte to HEX For Chinese",expectedChi, actualChi);
+	    assertEquals("failure In converting byte to HEX For Chinese",expectedChi, actualChi);
 	}
 	
 	@AfterClass

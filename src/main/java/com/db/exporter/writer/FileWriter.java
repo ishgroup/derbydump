@@ -32,6 +32,7 @@ public class FileWriter implements Runnable {
 	 * 
 	 */
 	public void run() {
+		LOGGER.debug("File writer intializing...");
 		Writer streamWriter = null;
 		try {
 			File file = new File(m_config.getDumpFilePath());
@@ -42,7 +43,7 @@ public class FileWriter implements Runnable {
 						try {
 							BufferManager.BUFFER_TOKEN.wait();
 						} catch (InterruptedException e) {
-							LOGGER.info("Reader interrupted. Killing writer.");
+							LOGGER.info("Writer interrupted. Exiting now.. ");
 							return;
 						}
 						// writing the data to the file
@@ -55,7 +56,7 @@ public class FileWriter implements Runnable {
 					}
 				}
 			}
-			System.out.println("TotalTime::"
+			LOGGER.debug("TotalTime:"
 					+ (System.currentTimeMillis() - Dumper.startTime) / 1000);
 		} catch (IOException e) {
 		} finally {
@@ -63,12 +64,13 @@ public class FileWriter implements Runnable {
 				if (streamWriter != null) {
 					streamWriter.close();
 				} else {
-					LOGGER.error("Could not get File stream");
+					LOGGER.error("File stream null");
 				}
 			} catch (IOException e) {
-				LOGGER.error("Could not close the stream writer: "
-						+ e.getMessage());
+				LOGGER.error("Could not close the stream writer: "+ e.getMessage());
 			}
 		}
+		LOGGER.debug("Writing done.");
+		LOGGER.debug("Dump completed!");
 	}
 }

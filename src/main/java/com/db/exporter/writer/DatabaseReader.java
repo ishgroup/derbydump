@@ -57,13 +57,14 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 		}
 		// creating a skeleton of tables and columns present in the database
 		MetadataReader metadata = new MetadataReader();
+		LOGGER.debug("Resolving database structure...");
 		Database database = metadata.readDatabase(connection);
 		getInternalData(database.getTables(), connection, schema);
 		if (connection != null) {
 			try {
 				connection.close();
 			} catch (SQLException e) {
-				LOGGER.error(e.getMessage());
+				LOGGER.error("Could not close database connection :" + e.getErrorCode() + " - " + e.getMessage());
 			}
 		}
 	}
@@ -77,9 +78,12 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 	 */
 	private void getInternalData(List<Table> tables, Connection connection,
 			String schema) {
+		LOGGER.debug("Fetching database data...");
 		int numOfTables = tables.size();
 		Statement statement = null;
 		ResultSet resultSet = null;
+		
+		m_buffer.add("SET FOREIGN_KEY_CHECKS = 0;");
 		// Iterating over the list of the tables
 		for (int t_index = 0; t_index < numOfTables; t_index++) {
 		    //Flag for reading end of table
@@ -234,35 +238,32 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 					}
 				}
 			} catch (SQLException e) {
-				LOGGER.error(e.getMessage(), e);
+				LOGGER.error("Error: " + e.getErrorCode() + " - " + e.getMessage());
 			} catch (InterruptedException e) {
-				LOGGER.error(DatabaseReader.class.getName()
-						+ ": Database Reader interrupted - exiting.");
+				LOGGER.error("Reader interrupted. Exiting now... :"+ e.getMessage());
 				return;
 			} finally {
 				if (resultSet != null)
 					try {
 						resultSet.close();
 					} catch (SQLException e1) {
-						LOGGER.error(e1.getErrorCode()
-								+ ": Could not close the resultset: "
-								+ e1.getMessage());
+						LOGGER.error("Could not close the resultset :" + e1.getErrorCode() + " - " + e1.getMessage());
 					}
 				if (statement != null)
 					try {
 						statement.close();
 					} catch (SQLException e) {
-						LOGGER.error(e.getErrorCode()
-								+ ": Could not close the statement: "
-								+ e.getMessage());
+						LOGGER.error("Could not close the statement :" + e.getErrorCode() + " - " + e.getMessage());
 					}
 			}
 		}
+		m_buffer.add("SET FOREIGN_KEY_CHECKS = 1;");
 		// reading from derby database is complete.
 		BufferManager.setReadingComplete(true);
 		synchronized (BufferManager.BUFFER_TOKEN) {
 			BufferManager.BUFFER_TOKEN.notify();
 		}
+		LOGGER.debug("Reading done.");
 	}
 
 	/**
@@ -295,9 +296,9 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 			}
 			br.close();
 		} catch (SQLException e) {
-			LOGGER.error(e.getMessage(), e);
+			LOGGER.error("Could not read data from stream :" + e.getErrorCode() + " - " + e.getMessage() + "\n"+ sb.toString());
 		} catch (IOException e) {
-			LOGGER.error(e.getMessage(), e);
+			LOGGER.error("Could not read data from stream :" +  e.getMessage() + "\n"+ sb.toString());
 		}
 		String result = sb.toString();
 		result = processStringData(result);
@@ -318,6 +319,7 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 	}
 	
 	public void run() {
+		LOGGER.debug("Database reader intializing...");
 		this.readMetaData(m_config.getSchemaName());
 	}
 }
