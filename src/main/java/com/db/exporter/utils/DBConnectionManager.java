@@ -23,17 +23,6 @@ public class DBConnectionManager {
 	 * @return Database connection
 	 * @throws SQLException
 	 */
-	public static synchronized Connection getConnection() throws SQLException {
-		return getConnection(StringUtils.getDerbyUrl(Configuration
-				.getConfiguration().getDerbyDbPath(), Configuration
-				.getConfiguration().getUserName(), Configuration
-				.getConfiguration().getPassword()));
-	}
-
-	/**
-	 * @return Database connection
-	 * @throws SQLException
-	 */
 	public static synchronized Connection getConnection(String url)
 			throws SQLException {
 		if (g_this == null) {

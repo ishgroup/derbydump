@@ -1,7 +1,19 @@
 package com.db.exporter.main;
 
+<<<<<<< HEAD
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
+=======
+import com.db.exporter.config.Configuration;
+import com.db.exporter.utils.DBConnectionManager;
+import com.db.exporter.utils.StringUtils;
+import com.db.exporter.writer.BufferManager;
+import com.db.exporter.writer.DatabaseReader;
+import com.db.exporter.writer.FileWriter;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+>>>>>>> 9af178b3858e985dc22107abd3571368e263247b
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,6 +24,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 
+<<<<<<< HEAD
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -23,6 +36,9 @@ import com.db.exporter.utils.StringUtils;
 import com.db.exporter.writer.BufferManager;
 import com.db.exporter.writer.DatabaseReader;
 import com.db.exporter.writer.FileWriter;
+=======
+import static junit.framework.Assert.assertTrue;
+>>>>>>> 9af178b3858e985dc22107abd3571368e263247b
 
 public class DumpTest {
 
@@ -30,7 +46,7 @@ public class DumpTest {
 	private static final String RESOURCE_DATABASE_PATH = "memory:testdb";
 	private static final String RESOURCE_DRIVER_NAME = "org.apache.derby.jdbc.EmbeddedDriver";
 	private static final String RESOURCE_SCHEMA_NAME = "app";
-	private static final String RESOURCE_DUMP_LOCATION = "./src/test/test.sql";
+	private static final String RESOURCE_DUMP_LOCATION = "./target/test.sql";
 	private static final int RESOURCE_MAX_BUFFER_SIZE = 200;
 
 	private static StringBuilder GOOD_QUERY = new StringBuilder("LOCK TABLES `DUMPERTEST` WRITE;\nINSERT INTO DUMPERTEST (ID, DES, TIME, NULLTIME, TYPE, LOCATION, ALERT, CLOBDATA) VALUES \n(1,'TestData','1970-01-01',null,'漢字',10,10");
@@ -41,6 +57,7 @@ public class DumpTest {
 	@BeforeClass
 	public static void setUp() throws Exception {
 		String url = StringUtils.getDerbyUrl("memory:testdb", "", "");
+		url = url.replace("create=false", "create=true");
 
 		connection = DBConnectionManager.getConnection(url);
 		config = Configuration.getConfiguration("", "", RESOURCE_DATABASE_PATH,
