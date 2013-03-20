@@ -20,6 +20,7 @@ import java.sql.Statement;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 
 public class DerbyDumpTest {
 
@@ -153,7 +154,9 @@ public class DerbyDumpTest {
 			byte[] test2_output = hexEncoder.encode(test2);
 		    assertEquals("failure In converting byte to HEX For Chinese", new String(test2_expected).toUpperCase(), new String(test2_output).toUpperCase());
 
-		} catch (UnsupportedEncodingException ignored) {}
+		} catch (UnsupportedEncodingException ignored) {
+			fail("UnsupportedEncodingException");
+		}
 	}
 	
 	@AfterClass
