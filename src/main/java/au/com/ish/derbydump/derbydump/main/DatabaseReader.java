@@ -90,7 +90,7 @@ public class DatabaseReader {
 		Statement statement = null;
 		ResultSet resultSet = null;
 		
-		output.add("SET FOREIGN_KEY_CHECKS = 0;");
+		output.add("SET FOREIGN_KEY_CHECKS = 0;\n");
 		// Iterating over the list of the tables
 		for (Table table : tables) {
 
