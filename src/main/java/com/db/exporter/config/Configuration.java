@@ -70,12 +70,10 @@ public class Configuration {
 	}
 
 	public int getBufferMaxSize() {
-		Integer bufferMaxSize = Integer.valueOf(prop.getProperty("dump.buffer.size"));
-
-		if (bufferMaxSize == null) {
+		if (prop.getProperty("dump.buffer.size") == null) {
 			return 8192;
 		}
-		return bufferMaxSize;
+		return  Integer.valueOf(prop.getProperty("dump.buffer.size"));
 	}
 
 	public void setBufferMaxSize(int bufferMaxSize) {
