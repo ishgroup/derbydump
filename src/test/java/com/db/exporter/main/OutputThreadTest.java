@@ -1,8 +1,7 @@
-package com.db.exporter.writer;
+package com.db.exporter.main;
 
 
 import com.db.exporter.config.Configuration;
-import com.db.exporter.main.OutputThread;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
