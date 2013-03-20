@@ -1,47 +1,39 @@
 package com.db.exporter.writer;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.math.BigDecimal;
-import java.sql.Clob;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-
 import com.db.exporter.beans.Column;
 import com.db.exporter.beans.Database;
 import com.db.exporter.beans.Table;
 import com.db.exporter.config.Configuration;
-import com.db.exporter.reader.IDatabaseReader;
 import com.db.exporter.reader.impl.MetadataReader;
 import com.db.exporter.utils.DBConnectionManager;
-import com.db.exporter.utils.HexUtils;
 import com.db.exporter.utils.StringUtils;
+import org.apache.commons.codec.CharEncoding;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.log4j.Logger;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.math.BigDecimal;
+import java.sql.*;
+import java.util.List;
 
 /**
  * Logical module representing a reader/producer which reads from a database and
  * writes to a buffer.
  */
-public class DatabaseReader implements IDatabaseReader, Runnable {
+public class DatabaseReader implements Runnable {
 
-	private IBuffer m_buffer;
-	private Configuration m_config;
 	public final static String SEPARATOR = ",";
 	private final static int MAX_ALLOWED_ROWS = 100; 
 	private static final Logger LOGGER = Logger.getLogger(DatabaseReader.class);
+	private final OutputThread output;
 
-	public DatabaseReader(Configuration config, IBuffer buffer) {
-		m_buffer = buffer;
-		m_config = config;
+	private Configuration config;
+
+	public DatabaseReader(OutputThread output) {
+		this.output = output;
+		config = Configuration.getConfiguration();
 	}
 
 	public void readMetaData(String schema) {
@@ -49,8 +41,7 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 		Connection connection;
 		try {
 			connection = DBConnectionManager.getConnection(StringUtils
-					.getDerbyUrl(m_config.getDerbyDbPath(),
-							m_config.getUserName(), m_config.getPassword()));
+					.getDerbyUrl(config.getDerbyDbPath(), config.getUserName(), config.getPassword()));
 		} catch (SQLException e1) {
 			LOGGER.error("Could not establish Database connection.", e1);
 			return;
@@ -79,18 +70,19 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 	private void getInternalData(List<Table> tables, Connection connection,
 			String schema) {
 		LOGGER.debug("Fetching database data...");
-		int numOfTables = tables.size();
+
 		Statement statement = null;
 		ResultSet resultSet = null;
 		
-		m_buffer.add("SET FOREIGN_KEY_CHECKS = 0;");
+		output.add("SET FOREIGN_KEY_CHECKS = 0;");
 		// Iterating over the list of the tables
-		for (int t_index = 0; t_index < numOfTables; t_index++) {
-		    //Flag for reading end of table
+		for (Table table : tables) {
+
+			//Flag for reading end of table
 			boolean t_flag = false;
 			StringBuilder initTableInsert = new StringBuilder();
 			// picking a table at index
-			Table table = tables.get(t_index);
+
 			// fetching the attributes of the table
 			String tableName = table.getTableName();
 			List<Column> columns = table.getColumns();
@@ -107,141 +99,129 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 				int counter = 0;
 				while (resultSet.next()) {
 					if (counter == 0) {
-					    initTableInsert.append("LOCK TABLES `" + tableName + "` WRITE;\n");
-					    initTableInsert.append("INSERT INTO " + tableName + " ");
+						initTableInsert.append("LOCK TABLES `" + tableName + "` WRITE;\n");
+						initTableInsert.append("INSERT INTO " + tableName + " ");
 						for (int c_index = 0; c_index < numOfColumns; c_index++) {
-						    //String columnName = columns.get(c_index).getColumnName();
-						    if(c_index == 0){
-						        initTableInsert.append("(");
-						    }
-						    initTableInsert.append(columns.get(c_index).getColumnName());
-						    if(c_index == numOfColumns -1){
-						        initTableInsert.append(") VALUES \n");
-						    }
-						    else{
-						        initTableInsert.append(", ");
-						    }
+							//String columnName = columns.get(c_index).getColumnName();
+							if (c_index == 0) {
+								initTableInsert.append("(");
+							}
+							initTableInsert.append(columns.get(c_index).getColumnName());
+							if (c_index == numOfColumns - 1) {
+								initTableInsert.append(") VALUES \n");
+							} else {
+								initTableInsert.append(", ");
+							}
 						}
-						m_buffer.add(initTableInsert.toString());
+						output.add(initTableInsert.toString());
 					}
 					// TODO Logic needs to be refined for end of table data.
 					if (counter == numOfRows - 1)
 						t_flag = true;
-					m_buffer.add("(");
+					output.add("(");
 					for (int c_index = 0; c_index < numOfColumns; c_index++) {
 						if (c_index > 0) {
-							m_buffer.add(SEPARATOR);
+							output.add(SEPARATOR);
 						}
 						Column column = columns.get(c_index);
 						String columnName = column.getColumnName();
 						int columnType = column.getColumnDataType();
 						switch (columnType) {
-						case Types.BINARY:
-						case Types.VARBINARY:
-						case Types.BLOB: {
-							byte[] bytes = resultSet.getBytes(columnName);
-							m_buffer.add(bytes == null ? null : processBinaryData(bytes));
-							break;
-						}
-						case Types.CLOB: {
-							Clob clob = resultSet.getClob(columnName);
-							m_buffer.add(clob == null ? null : processClobData(clob));
-							break;
-						}
-						case Types.CHAR:
-						case Types.LONGNVARCHAR:
-						case Types.VARCHAR: {
-							String stringData = resultSet.getString(columnName);
-							m_buffer.add(processStringData(stringData));
-							break;
-						}
-						case Types.TIME: {
-							Time obj = resultSet.getTime(columnName);
-							String timeData = obj == null ? null : obj
-									.toString();
-							m_buffer.add(processStringData(timeData));
-							break;
-						}
-						case Types.DATE: {
-							Date obj = resultSet.getDate(columnName);
-							String dateData = obj == null ? null : obj
-									.toString();
-							m_buffer.add(processStringData(dateData));
-							break;
-						}
-						case Types.TIMESTAMP: {
-							Timestamp obj = resultSet.getTimestamp(columnName);
-							String stringData = obj == null ? null : obj
-									.toString();
-							m_buffer.add(processStringData(stringData));
-							break;
-						}
-						case Types.SMALLINT:
-							Short shortData = resultSet.getShort(columnName);
-							m_buffer.add(shortData == null ? null : String
-									.valueOf(shortData));
-							break;
-						case Types.BIGINT:
-							Long longData = resultSet.getLong(columnName);
-							m_buffer.add(longData == null ? null : String
-									.valueOf(longData));
-							break;
-						case Types.INTEGER: {
-							int data = resultSet.getInt(columnName);
-							m_buffer.add(String.valueOf(data));
-							break;
-						}
-						case Types.NUMERIC:
-						case Types.DECIMAL:
-							BigDecimal decimalData = resultSet
-									.getBigDecimal(columnName);
-							m_buffer.add(decimalData == null ? null : String
-									.valueOf(decimalData));
-							break;
-						case Types.REAL:
-						case Types.FLOAT:
-							Float floatData = resultSet.getFloat(columnName);
-							m_buffer.add(floatData == null ? null : String
-									.valueOf(floatData));
-							break;
-						case Types.DOUBLE:
-							Double doubleData = resultSet.getDouble(columnName);
-							m_buffer.add(doubleData == null ? null : String
-									.valueOf(doubleData));
-							break;
-						default: {
-							Object object = resultSet.getObject(columnName);
-							m_buffer.add(object == null ? null : object
-									.toString());
-						}
+							case Types.BINARY:
+							case Types.VARBINARY:
+							case Types.BLOB: {
+								byte[] bytes = resultSet.getBytes(columnName);
+								output.add(bytes == null ? null : processBinaryData(bytes));
+								break;
+							}
+							case Types.CLOB: {
+								Clob clob = resultSet.getClob(columnName);
+								output.add(clob == null ? null : processClobData(clob));
+								break;
+							}
+							case Types.CHAR:
+							case Types.LONGNVARCHAR:
+							case Types.VARCHAR: {
+								String stringData = resultSet.getString(columnName);
+								output.add(processStringData(stringData));
+								break;
+							}
+							case Types.TIME: {
+								Time obj = resultSet.getTime(columnName);
+								String timeData = obj == null ? null : obj
+										.toString();
+								output.add(processStringData(timeData));
+								break;
+							}
+							case Types.DATE: {
+								Date obj = resultSet.getDate(columnName);
+								String dateData = obj == null ? null : obj
+										.toString();
+								output.add(processStringData(dateData));
+								break;
+							}
+							case Types.TIMESTAMP: {
+								Timestamp obj = resultSet.getTimestamp(columnName);
+								String stringData = obj == null ? null : obj
+										.toString();
+								output.add(processStringData(stringData));
+								break;
+							}
+							case Types.SMALLINT:
+								Short shortData = resultSet.getShort(columnName);
+								output.add(shortData == null ? null : String
+										.valueOf(shortData));
+								break;
+							case Types.BIGINT:
+								Long longData = resultSet.getLong(columnName);
+								output.add(longData == null ? null : String
+										.valueOf(longData));
+								break;
+							case Types.INTEGER: {
+								int data = resultSet.getInt(columnName);
+								output.add(String.valueOf(data));
+								break;
+							}
+							case Types.NUMERIC:
+							case Types.DECIMAL:
+								BigDecimal decimalData = resultSet
+										.getBigDecimal(columnName);
+								output.add(decimalData == null ? null : String
+										.valueOf(decimalData));
+								break;
+							case Types.REAL:
+							case Types.FLOAT:
+								Float floatData = resultSet.getFloat(columnName);
+								output.add(floatData == null ? null : String
+										.valueOf(floatData));
+								break;
+							case Types.DOUBLE:
+								Double doubleData = resultSet.getDouble(columnName);
+								output.add(doubleData == null ? null : String
+										.valueOf(doubleData));
+								break;
+							default: {
+								Object object = resultSet.getObject(columnName);
+								output.add(object == null ? null : object
+										.toString());
+							}
 						}
 					}
 					counter++;
-					if (!t_flag && counter%MAX_ALLOWED_ROWS != 0){
-						m_buffer.add("),\n");
-					}
-					else if(!t_flag){
-					    m_buffer.add(");\n").add(
-                                StringUtils.getUnLockStatement(tableName));
-					    m_buffer.add(initTableInsert.toString());
-					}
-					else {
-						m_buffer.add(");\n").add(
-								StringUtils.getUnLockStatement(tableName)).add("\n");
-					}
-
-					if (m_buffer.isFull()) {
-						synchronized (BufferManager.BUFFER_TOKEN) {
-							BufferManager.BUFFER_TOKEN.notify();
-							BufferManager.BUFFER_TOKEN.wait();
-						}
+					if (!t_flag && counter % MAX_ALLOWED_ROWS != 0) {
+						output.add("),\n");
+					} else if (!t_flag) {
+						output.add(");\n");
+						output.add(StringUtils.getUnLockStatement(tableName));
+						output.add(initTableInsert.toString());
+					} else {
+						output.add(");\n");
+						output.add(StringUtils.getUnLockStatement(tableName));
+						output.add("\n");
 					}
 				}
 			} catch (SQLException e) {
 				LOGGER.error("Error: " + e.getErrorCode() + " - " + e.getMessage());
-			} catch (InterruptedException e) {
-				LOGGER.error("Reader interrupted. Exiting now... :"+ e.getMessage());
-				return;
 			} finally {
 				if (resultSet != null)
 					try {
@@ -257,13 +237,10 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 					}
 			}
 		}
-		m_buffer.add("SET FOREIGN_KEY_CHECKS = 1;");
-		// reading from derby database is complete.
-		BufferManager.setReadingComplete(true);
-		synchronized (BufferManager.BUFFER_TOKEN) {
-			BufferManager.BUFFER_TOKEN.notify();
-		}
+		output.add("SET FOREIGN_KEY_CHECKS = 1;");
 		LOGGER.debug("Reading done.");
+
+		Thread.currentThread().interrupt();
 	}
 
 	/**
@@ -271,11 +248,12 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 	 * @return String representation of binary data
 	 */
 	public String processBinaryData(byte[] binaryData) {
-		if (binaryData == null)
+		if (binaryData == null) {
 			return null;
-		String data = HexUtils.bytesToString(binaryData);
-		data = "'" + data + "'";
-		return data;
+		}
+
+		Hex hexEncoder = new Hex(CharEncoding.UTF_8);
+		return  "'" + new String(hexEncoder.encode(binaryData)) + "'";
 	}
 
 	/**
@@ -320,6 +298,6 @@ public class DatabaseReader implements IDatabaseReader, Runnable {
 	
 	public void run() {
 		LOGGER.debug("Database reader intializing...");
-		this.readMetaData(m_config.getSchemaName());
+		this.readMetaData(config.getSchemaName());
 	}
 }

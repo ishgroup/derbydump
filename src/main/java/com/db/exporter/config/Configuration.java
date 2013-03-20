@@ -1,5 +1,6 @@
 package com.db.exporter.config;
 
+import java.io.FileInputStream;
 import java.util.Properties;
 
 /**
@@ -8,108 +9,82 @@ import java.util.Properties;
  */
 public class Configuration {
 
-	private static Configuration m_this;
-
-	private innerConfig m_default;
+	private static Configuration configuration;
+	private Properties prop = new Properties();
 
 	private Configuration() {
-		m_default = new innerConfig();
+		try {
+			FileInputStream file = new FileInputStream("derbydump.properties");
+			prop.load(file);
+			file.close();
+		} catch (Exception ignored) {}
+
 	}
 
 	public static synchronized Configuration getConfiguration() {
-		if (m_this == null) {
-			m_this = new Configuration();
+		if (configuration == null) {
+			configuration = new Configuration();
 		}
-		return m_this;
+		return configuration;
 	}
 
-	public static synchronized Configuration getConfiguration(String userName, String password, String derbyPath, String driverName, String schema, int maxBufferSize, String dumpLocation) {
-		if (m_this == null) {
-			m_this = new Configuration();
-		}
-		m_this.m_default = m_this.new innerConfig(userName, password, derbyPath, driverName, schema, maxBufferSize, dumpLocation);
-		
-		return m_this;
-	}
-	
-	/**
-	 * @return Database userName
-	 */
+
 	public String getUserName() {
-		return m_default.m_userName;
+		return prop.getProperty("db.userName");
 	}
 
-	/**
-	 * @return Database password
-	 */
+	public void setUserName(String userName) {
+		prop.setProperty("db.userName", userName);
+	}
+
 	public String getPassword() {
-		return m_default.m_password;
+		return prop.getProperty("db.password");
 	}
 
-	/**
-	 * @return Absolute path to the database
-	 */
+	public void setPassword(String password) {
+		prop.setProperty("db.password", password);
+	}
+
+	public String getDriverClassName() {
+		return prop.getProperty("db.driverClassName");
+	}
+
+	public void setDriverClassName(String driverClassName) {
+		prop.setProperty("db.driverClassName", driverClassName);
+	}
+
 	public String getDerbyDbPath() {
-		return m_default.m_derbyDbPath;
+		return prop.getProperty("db.derbyDbPath");
 	}
 
-	/**
-	 * @return JDBC driver name
-	 */
-	public String getDriverName() {
-		return m_default.m_driverClassName;
+	public void setDerbyDbPath(String derbyDbPath) {
+		prop.setProperty("db.derbyDbPath", derbyDbPath);
 	}
 
-	/**
-	 * @return Database schema name
-	 */
 	public String getSchemaName() {
-		return m_default.m_schemaName;
+		return prop.getProperty("db.schemaName");
 	}
 
-	/**
-	 * @return Maximum intermediate buffer size. Should atleast be long enough
-	 *         to hold the longest row. Impacts performance.
-	 */
-	public int maxBufferSize() {
-		return m_default.m_bufferMaxSize;
+	public void setSchemaName(String schemaName) {
+		prop.setProperty("db.schemaName", schemaName);
 	}
 
-	/**
-	 * @return Absolute target location for the dump file.
-	 */
-	public String getDumpFilePath() {
-		return m_default.m_dumpFilePath;
+	public int getBufferMaxSize() {
+		if (prop.getProperty("dump.buffer.size") == null) {
+			return 8192;
+		}
+		return  Integer.valueOf(prop.getProperty("dump.buffer.size"));
 	}
-	
-	class innerConfig{
-		private String m_userName;
-		private String m_password;
-		private String m_driverClassName;
-		private String m_derbyDbPath;
-		private String m_schemaName;
-		private int m_bufferMaxSize;
-		private String m_dumpFilePath;
-		
-		private innerConfig() {
-			Properties prop = PropertyLoader.loadProperties("dump");
-			m_userName = prop.getProperty("db.userName");
-			m_password = prop.getProperty("db.password");
-			m_derbyDbPath = prop.getProperty("db.derbyDbPath");
-			m_driverClassName = prop.getProperty("db.driverClassName");
-			m_schemaName = prop.getProperty("db.schemaName");
-			m_bufferMaxSize = Integer.valueOf(prop.getProperty("dump.buffer.size"));
-			m_dumpFilePath = prop.getProperty("dump.buffer.dumpPath");
-		}
-		
-		private innerConfig(String userName, String password, String derbyPath, String driverName, String schema, int maxBufferSize, String dumpLocation) {
-			m_userName = userName;
-			m_password = password;
-			m_derbyDbPath = derbyPath;
-			m_driverClassName = driverName;
-			m_schemaName = schema;
-			m_bufferMaxSize = Integer.valueOf(maxBufferSize);
-			m_dumpFilePath = dumpLocation;
-		}
+
+	public void setBufferMaxSize(int bufferMaxSize) {
+		prop.setProperty("dump.buffer.size", "" + bufferMaxSize);
+	}
+
+	public String getOutputFilePath() {
+		return prop.getProperty("outputPath");
+	}
+
+	public void setOutputFilePath(String outputFilePath) {
+		prop.setProperty("outputPath", outputFilePath);
 	}
 }

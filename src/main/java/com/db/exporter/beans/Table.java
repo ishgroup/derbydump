@@ -2,7 +2,6 @@ package com.db.exporter.beans;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -19,28 +18,12 @@ public class Table {
 	 * Name of the table in the database.
 	 */
 	private String tableName;
-	/**
-	 * Number of columns present in the table
-	 */
-	private int numOfColumns;
-	/**
-	 * Number of rows present in the table
-	 */
-	private int numOfRows;
 
 	/**
 	 * @return the columns
 	 */
 	public List<Column> getColumns() {
 		return columns;
-	}
-
-	/**
-	 * @param columns
-	 *            the columns to set
-	 */
-	public void setColumns(List<Column> columns) {
-		this.columns = columns;
 	}
 
 	/**
@@ -59,36 +42,6 @@ public class Table {
 	}
 
 	/**
-	 * @return the numOfColumns
-	 */
-	public int getNumOfColumns() {
-		return numOfColumns;
-	}
-
-	/**
-	 * @param numOfColumns
-	 *            the numOfColumns to set
-	 */
-	public void setNumOfColumns(int numOfColumns) {
-		this.numOfColumns = numOfColumns;
-	}
-
-	/**
-	 * @return the numOfRows
-	 */
-	public int getNumOfRows() {
-		return numOfRows;
-	}
-
-	/**
-	 * @param numOfRows
-	 *            the numOfRows to set
-	 */
-	public void setNumOfRows(int numOfRows) {
-		this.numOfRows = numOfRows;
-	}
-
-	/**
 	 * Adds the given column.
 	 * 
 	 * @param column
@@ -100,32 +53,17 @@ public class Table {
 		}
 	}
 
-	public void addColumn(int idx, Column column) {
-		if (column != null) {
-			columns.add(idx, column);
-		}
-	}
-
-	public void addColumn(Column previousColumn, Column column) {
-		if (column != null) {
-			if (previousColumn == null) {
-				columns.add(0, column);
-			} else {
-				columns.add(columns.indexOf(previousColumn), column);
-			}
-		}
-	}
-
 	/**
 	 * Adds the given columns.
 	 * 
 	 * @param columns
 	 *            The columns
 	 */
-	public void addColumns(Collection columns) {
-		for (Iterator it = columns.iterator(); it.hasNext();) {
-			addColumn((Column) it.next());
+	public void addColumns(Collection<Column> columns) {
+		for (Column column : columns) {
+			addColumn(column);
 		}
 	}
+
 
 }

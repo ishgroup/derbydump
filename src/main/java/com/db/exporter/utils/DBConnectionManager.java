@@ -1,10 +1,10 @@
 package com.db.exporter.utils;
 
+import com.db.exporter.config.Configuration;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
-import com.db.exporter.config.Configuration;
 
 /**
  * Singleton: Provides database connections. Note: Only provides one connection,
@@ -39,7 +39,7 @@ public class DBConnectionManager {
 	private Connection createConnection(String url) throws SQLException {
 		Connection connection = null;
 		try {
-			Class.forName(Configuration.getConfiguration().getDriverName())
+			Class.forName(Configuration.getConfiguration().getDriverClassName())
 					.newInstance();
 			connection = DriverManager.getConnection(url);
 		} catch (Exception e) {
