@@ -10,7 +10,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.*;
-import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -28,7 +27,7 @@ public class DerbyDumpTest {
 	private static final String RESOURCE_DUMP_LOCATION = "./target/test.sql";
 	private static final int RESOURCE_MAX_BUFFER_SIZE = 200;
 
-	private static Connection connection;
+	private static DBConnectionManager db;
 	private static Configuration config;
 
 	private static String BIG_CLOB;
@@ -42,7 +41,7 @@ public class DerbyDumpTest {
 		config.setBufferMaxSize(RESOURCE_MAX_BUFFER_SIZE);
 		config.setOutputFilePath(new File(RESOURCE_DUMP_LOCATION).getCanonicalPath());
 
-		connection = DBConnectionManager.getConnection(config.getDerbyUrl().replace("create=false", "create=true"));
+		db = new DBConnectionManager(config.getDerbyUrl().replace("create=false", "create=true"));
 
 		String sql = "CREATE TABLE "
 				+ Configuration.getConfiguration().getSchemaName()
@@ -50,12 +49,12 @@ public class DerbyDumpTest {
 				+ TABLE_NAME
 				+ "(Id INTEGER NOT NULL,Des VARCHAR(25),Time DATE,nullTime TIMESTAMP, Type VARCHAR(25),Location INTEGER,Alert INTEGER, clobData CLOB(32000))";
 
-		Statement statement = connection.createStatement();
+		Statement statement = db.getConnection().createStatement();
 		statement.execute(sql);
-		connection.commit();
+		db.getConnection().commit();
 		statement.close();
 		Thread.sleep(2000);
-		PreparedStatement ps = connection.prepareStatement("INSERT INTO "
+		PreparedStatement ps = db.getConnection().prepareStatement("INSERT INTO "
 				+ config.getSchemaName() + "." + TABLE_NAME
 				+ " VALUES (?,?,?,?,?,?,?,?)");
 		ps.setInt(1, 1);
@@ -78,7 +77,7 @@ public class DerbyDumpTest {
 
         ps.setClob(8, new StringReader(BIG_CLOB), BIG_CLOB.length());
 		ps.execute();
-		connection.commit();
+		db.getConnection().commit();
 		ps.close();
 	}
 
@@ -153,6 +152,6 @@ public class DerbyDumpTest {
 	
 	@AfterClass
 	public static void cleanUp() throws Exception {
-		connection.close();
+		db.getConnection().close();
 	}
 }

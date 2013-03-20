@@ -36,21 +36,21 @@ public class DatabaseReader implements Runnable {
 
 	public void readMetaData(String schema) {
 		// getting the connection
-		Connection connection;
+		DBConnectionManager db;
 		try {
-			connection = DBConnectionManager.getConnection(config.getDerbyUrl());
-		} catch (SQLException e1) {
-			LOGGER.error("Could not establish Database connection.", e1);
+			db = new DBConnectionManager(config.getDerbyUrl());
+		} catch (Exception e) {
+			LOGGER.error("Could not establish Database connection.", e);
 			return;
 		}
 		// creating a skeleton of tables and columns present in the database
 		MetadataReader metadata = new MetadataReader();
 		LOGGER.debug("Resolving database structure...");
-		Database database = metadata.readDatabase(connection);
-		getInternalData(database.getTables(), connection, schema);
-		if (connection != null) {
+		Database database = metadata.readDatabase(db.getConnection());
+		getInternalData(database.getTables(), db.getConnection(), schema);
+		if (db != null) {
 			try {
-				connection.close();
+				db.getConnection().close();
 			} catch (SQLException e) {
 				LOGGER.error("Could not close database connection :" + e.getErrorCode() + " - " + e.getMessage());
 			}
