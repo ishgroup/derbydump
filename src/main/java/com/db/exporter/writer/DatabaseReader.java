@@ -1,37 +1,27 @@
 package com.db.exporter.writer;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.math.BigDecimal;
-import java.sql.Clob;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-
 import com.db.exporter.beans.Column;
 import com.db.exporter.beans.Database;
 import com.db.exporter.beans.Table;
 import com.db.exporter.config.Configuration;
-import com.db.exporter.reader.IDatabaseReader;
 import com.db.exporter.reader.impl.MetadataReader;
 import com.db.exporter.utils.DBConnectionManager;
 import com.db.exporter.utils.HexUtils;
 import com.db.exporter.utils.StringUtils;
+import org.apache.log4j.Logger;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.math.BigDecimal;
+import java.sql.*;
+import java.util.List;
 
 /**
  * Logical module representing a reader/producer which reads from a database and
  * writes to a buffer.
  */
-public class DatabaseReader implements IDatabaseReader, Runnable {
+public class DatabaseReader implements Runnable {
 
 	private IBuffer m_buffer;
 	private Configuration m_config;
