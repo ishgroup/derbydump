@@ -36,7 +36,7 @@ import java.util.List;
  * Logical module representing a reader/producer which reads from a database and
  * writes to a buffer.
  */
-public class DatabaseReader implements Runnable {
+public class DatabaseReader {
 
 	private final static String SEPARATOR = ",";
 	private final static int MAX_ALLOWED_ROWS = 100; 
@@ -48,6 +48,9 @@ public class DatabaseReader implements Runnable {
 	public DatabaseReader(OutputThread output) {
 		this.output = output;
 		config = Configuration.getConfiguration();
+
+		LOGGER.debug("Database reader intializing...");
+		readMetaData(config.getSchemaName());
 	}
 
 	void readMetaData(String schema) {
@@ -306,11 +309,6 @@ public class DatabaseReader implements Runnable {
 		data = escapeQuotes(data.trim());
 		data = "'" + data + "'";
 		return data;
-	}
-	
-	public void run() {
-		LOGGER.debug("Database reader intializing...");
-		this.readMetaData(config.getSchemaName());
 	}
 
 	/**

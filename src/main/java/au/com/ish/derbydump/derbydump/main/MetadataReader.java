@@ -65,7 +65,7 @@ public class MetadataReader {
             ResultSet tables = dmd.getTables(null, null, null, new String[]{"TABLE"});
             while (tables.next()) {
                 Map values = readMetaData(tables, _columnsForTable);
-                Table table  = readTable(dmd, values);
+                Table table = readTable(dmd, values);
 				LOGGER.debug("Found table: " + table.getTableName());
 
 				database.addTable(table);
@@ -132,12 +132,10 @@ public class MetadataReader {
             // with Java 5, we would just use Matcher.quoteReplacement
             StringBuilder quotedEscape = new StringBuilder();
 
-            for (int idx = 0; idx < escape.length(); idx++)
-            {
+            for (int idx = 0; idx < escape.length(); idx++) {
                 char c = escape.charAt(idx);
 
-                switch (c)
-                {
+                switch (c) {
                     case '\\':
                         quotedEscape.append("\\\\");
                         break;

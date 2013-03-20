@@ -100,17 +100,11 @@ public class DerbyDumpTest {
 	public void test() throws Exception {
 
 		OutputThread output = new OutputThread();
-
-		Thread reader = new Thread(new DatabaseReader(output), "Database_reader");
-		Thread writer = new Thread(output, "writer test");
-
-		reader.start();
+		Thread writer = new Thread(output, "File_Writer");
 		writer.start();
 
-		// Now let's wait for the reader to finish
-		reader.join();
-
-		// And let the writer know that no more data is coming
+		new DatabaseReader(output);
+		// Let the writer know that no more data is coming
 		writer.interrupt();
 		writer.join();
 
