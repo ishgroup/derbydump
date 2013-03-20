@@ -1,11 +1,10 @@
 package com.db.exporter.main;
 
+import com.db.exporter.config.Configuration;
 import com.db.exporter.metadata.Column;
 import com.db.exporter.metadata.Database;
 import com.db.exporter.metadata.Table;
-import com.db.exporter.config.Configuration;
 import com.db.exporter.utils.DBConnectionManager;
-import com.db.exporter.utils.StringUtils;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
@@ -86,8 +85,8 @@ public class DatabaseReader implements Runnable {
 			List<Column> columns = table.getColumns();
 			int numOfColumns = columns.size();
 			// constructing the select query
-			String selectQuery = StringUtils.getSelectQuery(tableName, schema);
-			String countQuery = StringUtils.getCountQuery(tableName, schema);
+			String selectQuery = table.getSelectQuery(schema);
+			String countQuery = table.getCountQuery(schema);
 			try {
 				statement = connection.createStatement();
 				resultSet = statement.executeQuery(countQuery);
@@ -206,16 +205,15 @@ public class DatabaseReader implements Runnable {
 						}
 					}
 					counter++;
+					output.add(");\n");
+
 					if (!t_flag && counter % MAX_ALLOWED_ROWS != 0) {
-						output.add("),\n");
+
 					} else if (!t_flag) {
-						output.add(");\n");
-						output.add(StringUtils.getUnLockStatement(tableName));
+						output.add(table.getUnLockStatement() + "\n");
 						output.add(initTableInsert.toString());
 					} else {
-						output.add(");\n");
-						output.add(StringUtils.getUnLockStatement(tableName));
-						output.add("\n");
+						output.add(table.getUnLockStatement() + "\n");
 					}
 				}
 			} catch (SQLException e) {
@@ -289,7 +287,7 @@ public class DatabaseReader implements Runnable {
 		if (data == null)
 			return null;
 
-		data = StringUtils.escapeQuotes(data.trim());
+		data = escapeQuotes(data.trim());
 		data = "'" + data + "'";
 		return data;
 	}
@@ -297,5 +295,26 @@ public class DatabaseReader implements Runnable {
 	public void run() {
 		LOGGER.debug("Database reader intializing...");
 		this.readMetaData(config.getSchemaName());
+	}
+
+	/**
+	 * Escapes sql special characters
+	 *
+	 * @param raw
+	 *
+	 * @return Escaped query
+	 */
+	public static String escapeQuotes(String raw) {
+		StringBuilder cooked = new StringBuilder();
+		char c;
+		for (int i = 0; i < raw.length(); i++) {
+			c = raw.charAt(i);
+			if (c == '\'') {
+				cooked = cooked.append('\'').append(c);
+			} else {
+				cooked = cooked.append(c);
+			}
+		}
+		return cooked.toString();
 	}
 }

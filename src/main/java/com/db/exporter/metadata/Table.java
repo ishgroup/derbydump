@@ -19,6 +19,44 @@ public class Table {
 	 */
 	private String tableName;
 
+
+	/**
+	 * @param schema Database schema name
+	 *
+	 * @return Returns a string representation of the select query for table.
+	 */
+	public String getSelectQuery(String schema) {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("SELECT * FROM " + schema + ".");
+		stringBuilder.append(tableName);
+		return stringBuilder.toString();
+	}
+
+	/**
+	 * Computes a string representation of the count query for a table,
+	 * calculating the number of rows present in the table.
+	 *
+	 * @param schema Database schema name
+	 *
+	 * @return Returns a string representation of the count query for a table
+	 */
+	public String getCountQuery(String schema) {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("SELECT COUNT(*) FROM " + schema + ".");
+		stringBuilder.append(tableName);
+		return stringBuilder.toString();
+	}
+
+	/**
+	 * @return Returns a string containing Unlocking statement for table
+	 */
+	public String getUnLockStatement() {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("UNLOCK TABLES;");
+		return stringBuilder.toString();
+	}
+
+
 	/**
 	 * @return the columns
 	 */

@@ -2,7 +2,6 @@ package com.db.exporter.main;
 
 import com.db.exporter.config.Configuration;
 import com.db.exporter.utils.DBConnectionManager;
-import com.db.exporter.utils.StringUtils;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
@@ -16,9 +15,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
+import static junit.framework.Assert.*;
 
 public class DerbyDumpTest {
 
@@ -128,8 +125,8 @@ public class DerbyDumpTest {
 	    String positive_test1 = "Test for escapaing the quotes (here's it goes)";
 	    String positive_test2 = "Test for escapaing the double quotes (here''s it goes)";
 	    
-	    assertEquals(positive_test1, "Test for escapaing the quotes (here''s it goes)", StringUtils.escapeQuotes(positive_test1));
-	    assertEquals(positive_test2, "Test for escapaing the double quotes (here''''s it goes)", StringUtils.escapeQuotes(positive_test2));
+	    assertEquals(positive_test1, "Test for escapaing the quotes (here''s it goes)", DatabaseReader.escapeQuotes(positive_test1));
+	    assertEquals(positive_test2, "Test for escapaing the double quotes (here''''s it goes)", DatabaseReader.escapeQuotes(positive_test2));
    }
 	
 	@Test
