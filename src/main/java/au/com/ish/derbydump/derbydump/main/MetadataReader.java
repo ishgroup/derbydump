@@ -20,13 +20,15 @@ import au.com.ish.derbydump.derbydump.metadata.Column;
 import au.com.ish.derbydump.derbydump.metadata.Database;
 import au.com.ish.derbydump.derbydump.metadata.MetaDataColumnDescriptor;
 import au.com.ish.derbydump.derbydump.metadata.Table;
+import org.apache.log4j.Logger;
 
 import java.sql.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
 public class MetadataReader {
-    
+	private static final Logger LOGGER = Logger.getLogger(MetadataReader.class);
+
     private final Pattern searchStringPattern = Pattern.compile("[_%]");
     private static final List<MetaDataColumnDescriptor> columnsForColumn;
     private static final List<MetaDataColumnDescriptor> _columnsForTable;
@@ -54,32 +56,28 @@ public class MetadataReader {
         columnsForColumn.add(new MetaDataColumnDescriptor("REMARKS",        Types.VARCHAR));
     }
     
-    public Database readDatabase(Connection conn)
-    {
+    public Database readDatabase(Connection conn) {
         Database database = new Database();
         database.setDatabaseName("mydatabase");
         try{
             
             DatabaseMetaData dmd = conn.getMetaData();
             ResultSet tables = dmd.getTables(null, null, null, new String[]{"TABLE"});
-            while(tables.next()){
-                Map values = readColumns(tables, _columnsForTable);
+            while (tables.next()) {
+                Map values = readMetaData(tables, _columnsForTable);
                 Table table  = readTable(dmd, values);
+				LOGGER.debug("Found table: " + table.getTableName());
 
-                if (table != null)
-                {
-                    database.addTable(table);
-                }
+				database.addTable(table);
             }
         }
         catch(SQLException e){
-            e.printStackTrace();
+            LOGGER.error(e);
         }
         return database;
     }
     
-    Map<String, Object> readColumns(ResultSet resultSet, List<MetaDataColumnDescriptor> columnDescriptors) throws SQLException
-    {
+    Map<String, Object> readMetaData(ResultSet resultSet, List<MetaDataColumnDescriptor> columnDescriptors) throws SQLException {
         HashMap<String, Object> values = new HashMap<String, Object>();
 
 	    for (MetaDataColumnDescriptor descriptor : columnDescriptors) {
@@ -88,14 +86,14 @@ public class MetadataReader {
         return values;
     }
     
-    Table readTable(DatabaseMetaData metaData, Map values) throws SQLException
-    {
+    Table readTable(DatabaseMetaData metaData, Map values) throws SQLException {
         String tableName = (String)values.get("TABLE_NAME");
         Table table = null;
         
         if ((tableName != null) && (tableName.length() > 0)) {
             table = new Table();
             table.setTableName(tableName);
+	        table.addColumns(readColumns(metaData, tableName));
         }
         return table;
     }
@@ -105,7 +103,7 @@ public class MetadataReader {
 	    List<Column> columns = new ArrayList<Column>();
 
 	    while (columnData.next()) {
-	        Map values = readColumns(columnData, columnsForColumn);
+	        Map values = readMetaData(columnData, columnsForColumn);
 		    Column column = new Column();
 		    column.setColumnName((String)values.get("COLUMN_NAME"));
 		    column.setColumnDataType((Integer) values.get("DATA_TYPE"));
