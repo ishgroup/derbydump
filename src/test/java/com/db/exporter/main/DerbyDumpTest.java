@@ -1,7 +1,15 @@
 package com.db.exporter.main;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import com.db.exporter.config.Configuration;
+import com.db.exporter.utils.DBConnectionManager;
+import com.db.exporter.utils.HexUtils;
+import com.db.exporter.utils.StringUtils;
+import com.db.exporter.writer.BufferManager;
+import com.db.exporter.writer.DatabaseReader;
+import com.db.exporter.writer.FileWriter;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,19 +21,10 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 
-import com.db.exporter.config.Configuration;
-import com.db.exporter.utils.DBConnectionManager;
-import com.db.exporter.utils.HexUtils;
-import com.db.exporter.utils.StringUtils;
-import com.db.exporter.writer.BufferManager;
-import com.db.exporter.writer.DatabaseReader;
-import com.db.exporter.writer.FileWriter;
-
-public class DumpTest {
+public class DerbyDumpTest {
 
 	private static final String TABLE_NAME = "DumperTest";
 	private static final String RESOURCE_DATABASE_PATH = "memory:testdb";
@@ -44,11 +43,14 @@ public class DumpTest {
 		String url = StringUtils.getDerbyUrl("memory:testdb", "", "");
 		url = url.replace("create=false", "create=true");
 
+		config = Configuration.getConfiguration();
+		config.setDerbyDbPath(RESOURCE_DATABASE_PATH);
+		config.setDriverClassName(RESOURCE_DRIVER_NAME);
+		config.setSchemaName(RESOURCE_SCHEMA_NAME);
+		config.setBufferMaxSize(RESOURCE_MAX_BUFFER_SIZE);
+		config.setOutputFilePath(new File(RESOURCE_DUMP_LOCATION).getCanonicalPath());
+
 		connection = DBConnectionManager.getConnection(url);
-		config = Configuration.getConfiguration("", "", RESOURCE_DATABASE_PATH,
-				RESOURCE_DRIVER_NAME, RESOURCE_SCHEMA_NAME,
-				RESOURCE_MAX_BUFFER_SIZE,
-				new File(RESOURCE_DUMP_LOCATION).getCanonicalPath());
 
 		String sql = "CREATE TABLE "
 				+ Configuration.getConfiguration().getSchemaName()
@@ -100,7 +102,7 @@ public class DumpTest {
 		writer.start();
 
 		Thread.sleep(2000);
-		File file = new File(config.getDumpFilePath());
+		File file = new File(config.getOutputFilePath());
 
 		StringBuilder sb = new StringBuilder();
 

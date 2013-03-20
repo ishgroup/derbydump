@@ -1,8 +1,8 @@
 package com.db.exporter.writer;
 
-import java.io.IOException;
-
 import com.db.exporter.config.Configuration;
+
+import java.io.IOException;
 
 /**
  * Singleton: Encapsulates the buffer used for reading and writing.
@@ -58,12 +58,12 @@ class StringBuilderAsBuffer implements IBuffer {
 
 	private void init(){
 		m_buffer = new StringBuilder(Configuration.getConfiguration()
-				.maxBufferSize());
+				.getBufferMaxSize());
 	}
 	
 	public boolean isFull() {
 		return m_buffer.length() >= Configuration.getConfiguration()
-				.maxBufferSize();
+				.getBufferMaxSize();
 	}
 
 	public boolean isEmpty() {
@@ -75,7 +75,7 @@ class StringBuilderAsBuffer implements IBuffer {
 	}
 
 	public int maxSize() {
-		return Configuration.getConfiguration().maxBufferSize();
+		return Configuration.getConfiguration().getBufferMaxSize();
 	}
 
 	public String flush() throws IOException {

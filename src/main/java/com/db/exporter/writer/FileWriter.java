@@ -1,12 +1,10 @@
 package com.db.exporter.writer;
 
-import java.io.*;
-
+import com.db.exporter.config.Configuration;
 import com.db.exporter.main.DerbyDump;
 import org.apache.log4j.Logger;
 
-import com.db.exporter.config.Configuration;
-import com.db.exporter.utils.IOUtils;
+import java.io.*;
 
 /**
  * Logical module representing a writer/consumer which flushes the buffer and
@@ -33,7 +31,7 @@ public class FileWriter implements Runnable {
 		LOGGER.debug("File writer intializing...");
 		Writer streamWriter = null;
 		try {
-			File file = new File(m_config.getDumpFilePath());
+			File file = new File(m_config.getOutputFilePath());
 
 			if (!file.exists()) {
 				file.createNewFile();

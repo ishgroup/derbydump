@@ -22,9 +22,9 @@ db.password = secret!
 
 ## Internal options ##
 # buffer size in kB. Must be larger than the largest row.
-dump.buffer.size = 20000
+dump.buffer.size = 8912 
 
 
 ## Output options ##
 # Path to where you want the output file written
-dump.buffer.dumpPath = derbyDumpOutput.sql
+outputPath = derbyDumpOutput.sql

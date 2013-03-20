@@ -1,5 +1,6 @@
 package com.db.exporter;
 
+import com.db.exporter.main.DerbyDumpTest;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -10,7 +11,7 @@ import org.junit.runners.Suite;
  * 
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ com.db.exporter.main.DumpTest.class })
+@Suite.SuiteClasses({ DerbyDumpTest.class })
 public class AllTests {
 	/**
 	 * @throws Exception
