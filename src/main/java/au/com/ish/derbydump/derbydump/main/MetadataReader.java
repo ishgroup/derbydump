@@ -75,105 +75,46 @@ public class MetadataReader {
     Table readTable(DatabaseMetaData metaData, Map values) throws SQLException
     {
         String tableName = (String)values.get("TABLE_NAME");
-        Table  table     = null;
+        Table table = null;
         
-        if ((tableName != null) && (tableName.length() > 0))
-        {
+        if ((tableName != null) && (tableName.length() > 0)) {
             table = new Table();
             table.setTableName(tableName);
-            /*table.setType((String)values.get("TABLE_TYPE"));
-            table.setCatalog((String)values.get("TABLE_CAT"));
-            table.setSchema((String)values.get("TABLE_SCHEM"));
-            table.setDescription((String)values.get("REMARKS"));*/
-
-            table.addColumns(readColumns(metaData, tableName));
-            /*table.addForeignKeys(readForeignKeys(metaData, tableName));
-            table.addIndices(readIndices(metaData, tableName));
-
-            Collection primaryKeys = readPrimaryKeyNames(metaData, tableName);
-
-            for (Iterator it = primaryKeys.iterator(); it.hasNext();)
-            {
-                table.findColumn((String)it.next(), true).setPrimaryKey(true);
-            }
-
-            if (getPlatformInfo().isSystemIndicesReturned())
-            {
-                removeSystemIndices(metaData, table);
-            }
-*/        }
+        }
         return table;
     }
     
-    List<Column> readColumns(DatabaseMetaData metaData, String tableName) throws SQLException
-    {
-        ResultSet columnData;
-	    columnData = metaData.getColumns(null, null,escapeForSearch(metaData, tableName), "%");
+    List<Column> readColumns(DatabaseMetaData metaData, String tableName) throws SQLException {
+        ResultSet columnData = metaData.getColumns(null, null, escapeForSearch(metaData, tableName), "%");
 	    List<Column> columns = new ArrayList<Column>();
-	    while (columnData.next())
-	    {
+
+	    while (columnData.next()) {
 	        Map values = readColumns(columnData, columnsForColumn);
-	        columns.add(readColumn(values));
+		    Column column = new Column();
+		    column.setColumnName((String)values.get("COLUMN_NAME"));
+		    column.setColumnDataType((Integer) values.get("DATA_TYPE"));
+	        columns.add(column);
 	    }
 	    columnData.close();
 	    return columns;
     }
-    
-    Column readColumn(Map values) {
-        Column column = new Column();
-        column.setColumnName((String)values.get("COLUMN_NAME"));
-        column.setColumnDataType((Integer) values.get("DATA_TYPE"));
-        //column.setName((String)values.get("COLUMN_NAME"));
-        /*column.setDefaultValue((String)values.get("COLUMN_DEF"));
-        column.setTypeCode(((Integer)values.get("DATA_TYPE")).intValue());
 
-        Integer precision = (Integer)values.get("NUM_PREC_RADIX");
-
-        if (precision != null)
-        {
-            column.setPrecisionRadix(precision.intValue());
-        }
-*/
-        /*String size = (String)values.get("COLUMN_SIZE");
-
-        if (size == null)
-        {
-            size = (String)_defaultSizes.get(new Integer(column.getTypeCode()));
-        }
-        // we're setting the size after the precision and radix in case
-        // the database prefers to return them in the size value
-        column.setSize(size);
-
-        Integer scale = (Integer)values.get("DECIMAL_DIGITS");
-
-        if (scale != null)
-        {
-            // if there is a scale value, set it after the size (which probably did not contain
-            // a scale specification)
-            column.setScale(scale.intValue());
-        }
-        column.setRequired("NO".equalsIgnoreCase(((String)values.get("IS_NULLABLE")).trim()));
-
-        String description = (String)values.get("REMARKS");
-
-        if (!org.apache.ddlutils.util.StringUtilsExt.isEmpty(description))
-        {
-            column.setDescription(description);
-        }
-*/        return column;
-    }
-    
-    String escapeForSearch(DatabaseMetaData metaData, String literalString) throws SQLException
-    {
+	/**
+	 * This comes from https://svn.apache.org/repos/asf/db/ddlutils/trunk/src/main/java/org/apache/ddlutils/platform/DatabaseMetaDataWrapper.java
+	 *
+	 * @param metaData
+	 * @param literalString
+	 * @return
+	 * @throws SQLException
+	 */
+    String escapeForSearch(DatabaseMetaData metaData, String literalString) throws SQLException {
         String escape = metaData.getSearchStringEscape();
 
-        if (escape.equals(""))
-        {
+        if (escape.equals("")) {
             // No escape string, so nothing to do...
             return literalString;
-        }
-        else
-        {
+
+        } else {
             // with Java 5, we would just use Matcher.quoteReplacement
             StringBuilder quotedEscape = new StringBuilder();
 
