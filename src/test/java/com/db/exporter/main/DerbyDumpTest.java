@@ -38,9 +38,6 @@ public class DerbyDumpTest {
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-		String url = StringUtils.getDerbyUrl("memory:testdb", "", "");
-		url = url.replace("create=false", "create=true");
-
 		config = Configuration.getConfiguration();
 		config.setDerbyDbPath(RESOURCE_DATABASE_PATH);
 		config.setDriverClassName(RESOURCE_DRIVER_NAME);
@@ -48,7 +45,7 @@ public class DerbyDumpTest {
 		config.setBufferMaxSize(RESOURCE_MAX_BUFFER_SIZE);
 		config.setOutputFilePath(new File(RESOURCE_DUMP_LOCATION).getCanonicalPath());
 
-		connection = DBConnectionManager.getConnection(url);
+		connection = DBConnectionManager.getConnection(config.getDerbyUrl().replace("create=false", "create=true"));
 
 		String sql = "CREATE TABLE "
 				+ Configuration.getConfiguration().getSchemaName()

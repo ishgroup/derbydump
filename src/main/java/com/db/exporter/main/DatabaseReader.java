@@ -39,8 +39,7 @@ public class DatabaseReader implements Runnable {
 		// getting the connection
 		Connection connection;
 		try {
-			connection = DBConnectionManager.getConnection(StringUtils
-					.getDerbyUrl(config.getDerbyDbPath(), config.getUserName(), config.getPassword()));
+			connection = DBConnectionManager.getConnection(config.getDerbyUrl());
 		} catch (SQLException e1) {
 			LOGGER.error("Could not establish Database connection.", e1);
 			return;

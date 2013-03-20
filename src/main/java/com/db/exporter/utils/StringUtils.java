@@ -11,25 +11,6 @@ public class StringUtils {
 	static Logger LOGGER = Logger.getLogger(StringUtils.class);
 
 	/**
-	 * @param derbyDbPath
-	 * @param userName
-	 * @param password
-	 * @return Returns url used for connecting to the database.
-	 */
-	public static String getDerbyUrl(String derbyDbPath, String userName,
-			String password) {
-		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("jdbc:derby:");
-		stringBuilder.append(derbyDbPath);
-		stringBuilder.append(";create=true;");
-		stringBuilder.append("user=" + userName + ";");
-		stringBuilder.append("password=" + password + ";");
-		stringBuilder.append("create=false;");
-		String derbyDBUrl = stringBuilder.toString();
-		return derbyDBUrl;
-	}
-
-	/**
 	 * @param tableName
 	 *            Database table name
 	 * @param schema
