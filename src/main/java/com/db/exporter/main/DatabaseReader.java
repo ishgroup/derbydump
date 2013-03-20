@@ -1,11 +1,10 @@
 package com.db.exporter.main;
 
+import com.db.exporter.config.Configuration;
 import com.db.exporter.metadata.Column;
 import com.db.exporter.metadata.Database;
 import com.db.exporter.metadata.Table;
-import com.db.exporter.config.Configuration;
 import com.db.exporter.utils.DBConnectionManager;
-import com.db.exporter.utils.StringUtils;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
@@ -37,22 +36,21 @@ public class DatabaseReader implements Runnable {
 
 	public void readMetaData(String schema) {
 		// getting the connection
-		Connection connection;
+		DBConnectionManager db;
 		try {
-			connection = DBConnectionManager.getConnection(StringUtils
-					.getDerbyUrl(config.getDerbyDbPath(), config.getUserName(), config.getPassword()));
-		} catch (SQLException e1) {
-			LOGGER.error("Could not establish Database connection.", e1);
+			db = new DBConnectionManager(config.getDerbyUrl());
+		} catch (Exception e) {
+			LOGGER.error("Could not establish Database connection.", e);
 			return;
 		}
 		// creating a skeleton of tables and columns present in the database
 		MetadataReader metadata = new MetadataReader();
 		LOGGER.debug("Resolving database structure...");
-		Database database = metadata.readDatabase(connection);
-		getInternalData(database.getTables(), connection, schema);
-		if (connection != null) {
+		Database database = metadata.readDatabase(db.getConnection());
+		getInternalData(database.getTables(), db.getConnection(), schema);
+		if (db != null) {
 			try {
-				connection.close();
+				db.getConnection().close();
 			} catch (SQLException e) {
 				LOGGER.error("Could not close database connection :" + e.getErrorCode() + " - " + e.getMessage());
 			}
@@ -87,8 +85,8 @@ public class DatabaseReader implements Runnable {
 			List<Column> columns = table.getColumns();
 			int numOfColumns = columns.size();
 			// constructing the select query
-			String selectQuery = StringUtils.getSelectQuery(tableName, schema);
-			String countQuery = StringUtils.getCountQuery(tableName, schema);
+			String selectQuery = table.getSelectQuery(schema);
+			String countQuery = table.getCountQuery(schema);
 			try {
 				statement = connection.createStatement();
 				resultSet = statement.executeQuery(countQuery);
@@ -207,16 +205,15 @@ public class DatabaseReader implements Runnable {
 						}
 					}
 					counter++;
+					output.add(");\n");
+
 					if (!t_flag && counter % MAX_ALLOWED_ROWS != 0) {
-						output.add("),\n");
+
 					} else if (!t_flag) {
-						output.add(");\n");
-						output.add(StringUtils.getUnLockStatement(tableName));
+						output.add(table.getUnLockStatement() + "\n");
 						output.add(initTableInsert.toString());
 					} else {
-						output.add(");\n");
-						output.add(StringUtils.getUnLockStatement(tableName));
-						output.add("\n");
+						output.add(table.getUnLockStatement() + "\n");
 					}
 				}
 			} catch (SQLException e) {
@@ -290,7 +287,7 @@ public class DatabaseReader implements Runnable {
 		if (data == null)
 			return null;
 
-		data = StringUtils.escapeQuotes(data.trim());
+		data = escapeQuotes(data.trim());
 		data = "'" + data + "'";
 		return data;
 	}
@@ -298,5 +295,26 @@ public class DatabaseReader implements Runnable {
 	public void run() {
 		LOGGER.debug("Database reader intializing...");
 		this.readMetaData(config.getSchemaName());
+	}
+
+	/**
+	 * Escapes sql special characters
+	 *
+	 * @param raw
+	 *
+	 * @return Escaped query
+	 */
+	public static String escapeQuotes(String raw) {
+		StringBuilder cooked = new StringBuilder();
+		char c;
+		for (int i = 0; i < raw.length(); i++) {
+			c = raw.charAt(i);
+			if (c == '\'') {
+				cooked = cooked.append('\'').append(c);
+			} else {
+				cooked = cooked.append(c);
+			}
+		}
+		return cooked.toString();
 	}
 }

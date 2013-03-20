@@ -28,6 +28,18 @@ public class Configuration {
 		return configuration;
 	}
 
+	public String getDerbyUrl() {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("jdbc:derby:");
+		stringBuilder.append(getDerbyDbPath());
+		stringBuilder.append(";create=true;");
+		stringBuilder.append("user=" + getUserName() + ";");
+		stringBuilder.append("password=" + getPassword() + ";");
+		stringBuilder.append("create=false;");
+
+		return stringBuilder.toString();
+	}
+
 
 	public String getUserName() {
 		return prop.getProperty("db.userName");
