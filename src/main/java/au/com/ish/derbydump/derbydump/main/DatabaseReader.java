@@ -1,10 +1,10 @@
-package com.db.exporter.main;
+package au.com.ish.derbydump.derbydump.main;
 
-import com.db.exporter.config.Configuration;
-import com.db.exporter.metadata.Column;
-import com.db.exporter.metadata.Database;
-import com.db.exporter.metadata.Table;
-import com.db.exporter.utils.DBConnectionManager;
+import au.com.ish.derbydump.derbydump.config.Configuration;
+import au.com.ish.derbydump.derbydump.metadata.Column;
+import au.com.ish.derbydump.derbydump.metadata.Database;
+import au.com.ish.derbydump.derbydump.metadata.Table;
+import au.com.ish.derbydump.derbydump.utils.DBConnectionManager;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;

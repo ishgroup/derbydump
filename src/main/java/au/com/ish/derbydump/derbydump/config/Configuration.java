@@ -1,4 +1,4 @@
-package com.db.exporter.config;
+package au.com.ish.derbydump.derbydump.config;
 
 import java.io.FileInputStream;
 import java.util.Properties;

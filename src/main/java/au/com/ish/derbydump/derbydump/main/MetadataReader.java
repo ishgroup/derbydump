@@ -1,9 +1,9 @@
-package com.db.exporter.main;
+package au.com.ish.derbydump.derbydump.main;
 
-import com.db.exporter.metadata.Column;
-import com.db.exporter.metadata.Database;
-import com.db.exporter.metadata.MetaDataColumnDescriptor;
-import com.db.exporter.metadata.Table;
+import au.com.ish.derbydump.derbydump.metadata.Column;
+import au.com.ish.derbydump.derbydump.metadata.Database;
+import au.com.ish.derbydump.derbydump.metadata.MetaDataColumnDescriptor;
+import au.com.ish.derbydump.derbydump.metadata.Table;
 
 import java.sql.*;
 import java.util.*;

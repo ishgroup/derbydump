@@ -1,4 +1,4 @@
-package com.db.exporter.metadata;
+package au.com.ish.derbydump.derbydump.metadata;
 
 /**
  * Represents a column in a database table.

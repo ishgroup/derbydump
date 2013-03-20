@@ -1,6 +1,6 @@
-package com.db.exporter.main;
+package au.com.ish.derbydump.derbydump.main;
 
-import com.db.exporter.config.Configuration;
+import au.com.ish.derbydump.derbydump.config.Configuration;
 import org.apache.log4j.Logger;
 
 import java.io.*;

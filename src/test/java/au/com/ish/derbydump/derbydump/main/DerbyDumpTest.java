@@ -1,7 +1,7 @@
-package com.db.exporter.main;
+package au.com.ish.derbydump.derbydump.main;
 
-import com.db.exporter.config.Configuration;
-import com.db.exporter.utils.DBConnectionManager;
+import au.com.ish.derbydump.derbydump.config.Configuration;
+import au.com.ish.derbydump.derbydump.utils.DBConnectionManager;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;

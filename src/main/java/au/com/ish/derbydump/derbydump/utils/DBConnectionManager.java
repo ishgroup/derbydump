@@ -1,6 +1,6 @@
-package com.db.exporter.utils;
+package au.com.ish.derbydump.derbydump.utils;
 
-import com.db.exporter.config.Configuration;
+import au.com.ish.derbydump.derbydump.config.Configuration;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
