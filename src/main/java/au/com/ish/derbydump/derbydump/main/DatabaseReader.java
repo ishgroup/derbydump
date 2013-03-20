@@ -4,7 +4,7 @@ import au.com.ish.derbydump.derbydump.config.Configuration;
 import au.com.ish.derbydump.derbydump.metadata.Column;
 import au.com.ish.derbydump.derbydump.metadata.Database;
 import au.com.ish.derbydump.derbydump.metadata.Table;
-import au.com.ish.derbydump.derbydump.utils.DBConnectionManager;
+import au.com.ish.derbydump.derbydump.config.DBConnectionManager;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;

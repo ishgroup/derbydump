@@ -1,4 +1,4 @@
-package au.com.ish.derbydump.derbydump.utils;
+package au.com.ish.derbydump.derbydump.config;
 
 import au.com.ish.derbydump.derbydump.config.Configuration;
 
