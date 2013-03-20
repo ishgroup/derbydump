@@ -1,9 +1,9 @@
-package com.db.exporter.reader.impl;
+package com.db.exporter.main;
 
-import com.db.exporter.beans.Column;
-import com.db.exporter.beans.Database;
-import com.db.exporter.beans.MetaDataColumnDescriptor;
-import com.db.exporter.beans.Table;
+import com.db.exporter.metadata.Column;
+import com.db.exporter.metadata.Database;
+import com.db.exporter.metadata.MetaDataColumnDescriptor;
+import com.db.exporter.metadata.Table;
 
 import java.sql.*;
 import java.util.*;

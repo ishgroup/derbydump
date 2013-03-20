@@ -1,8 +1,6 @@
 package com.db.exporter.main;
 
 import com.db.exporter.config.Configuration;
-import com.db.exporter.writer.DatabaseReader;
-import com.db.exporter.writer.OutputThread;
 import org.apache.log4j.Logger;
 
 

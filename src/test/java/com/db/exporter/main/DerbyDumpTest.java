@@ -3,8 +3,6 @@ package com.db.exporter.main;
 import com.db.exporter.config.Configuration;
 import com.db.exporter.utils.DBConnectionManager;
 import com.db.exporter.utils.StringUtils;
-import com.db.exporter.writer.DatabaseReader;
-import com.db.exporter.writer.OutputThread;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;

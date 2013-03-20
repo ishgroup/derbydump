@@ -1,4 +1,4 @@
-package com.db.exporter.beans;
+package com.db.exporter.metadata;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
