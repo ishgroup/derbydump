@@ -68,7 +68,7 @@
           			<archive>
             			<manifest>
               				<addClasspath>true</addClasspath>
-              				<mainClass>com.db.exporter.main.Dumper</mainClass>
+              				<mainClass>com.db.exporter.main.DerbyDump</mainClass>
             			</manifest>
           			</archive>
         		</configuration>
@@ -80,7 +80,7 @@
                 	  	<archive>
                     	  <manifest>
                         	<addClasspath>true</addClasspath>
-                          	<mainClass>com.db.exporter.main.Dumper</mainClass>
+                          	<mainClass>com.db.exporter.main.DerbyDump</mainClass>
                       	</manifest>
                   		</archive>
                   	<descriptorRefs>

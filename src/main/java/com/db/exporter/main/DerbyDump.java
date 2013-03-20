@@ -11,10 +11,10 @@ import com.db.exporter.writer.DatabaseReader;
 import com.db.exporter.writer.FileWriter;
 
 
-public class Dumper {
+public class DerbyDump {
 	
 	public static long startTime;
-	private static final Logger LOGGER = Logger.getLogger(Dumper.class);
+	private static final Logger LOGGER = Logger.getLogger(DerbyDump.class);
 	
 	public static void main(String[] args) {
 		try {
@@ -28,7 +28,7 @@ public class Dumper {
 			 * 
 			 * After dump has been created the threads will kill themselves.
 			 */
-		    //c:/> java -jar -DderbyDbPath=D:/onCourse -Duser=report -Dpassword=948ty -DdriverName=org.apache.derby.jdbc.EmbeddedDriver -Dschema=onCourse -DbufferSize=20000 -DdumpPath=D:/test.sql Dumper   
+		    //c:/> java -jar -DderbyDbPath=D:/onCourse -Duser=report -Dpassword=948ty -DdriverName=org.apache.derby.jdbc.EmbeddedDriver -Dschema=onCourse -DbufferSize=20000 -DdumpPath=D:/test.sql DerbyDump
 			
 			if(args.length != 0){
 				LOGGER.debug("Usage: [-options] .jar");

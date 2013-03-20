@@ -2,10 +2,10 @@ package com.db.exporter.writer;
 
 import java.io.*;
 
+import com.db.exporter.main.DerbyDump;
 import org.apache.log4j.Logger;
 
 import com.db.exporter.config.Configuration;
-import com.db.exporter.main.Dumper;
 import com.db.exporter.utils.IOUtils;
 
 /**
@@ -60,7 +60,7 @@ public class FileWriter implements Runnable {
 				}
 			}
 			LOGGER.debug("TotalTime:"
-					+ (System.currentTimeMillis() - Dumper.startTime) / 1000);
+					+ (System.currentTimeMillis() - DerbyDump.startTime) / 1000);
 		} catch (IOException e) {
 		} finally {
 			try {
