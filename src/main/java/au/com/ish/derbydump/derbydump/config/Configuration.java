@@ -33,8 +33,8 @@ public class Configuration {
 		stringBuilder.append("jdbc:derby:");
 		stringBuilder.append(getDerbyDbPath());
 		stringBuilder.append(";create=true;");
-		stringBuilder.append("user=" + getUserName() + ";");
-		stringBuilder.append("password=" + getPassword() + ";");
+		stringBuilder.append("user=").append(getUserName()).append(";");
+		stringBuilder.append("password=").append(getPassword()).append(";");
 		stringBuilder.append("create=false;");
 
 		return stringBuilder.toString();

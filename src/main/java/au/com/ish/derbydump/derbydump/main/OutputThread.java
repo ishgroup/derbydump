@@ -14,13 +14,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class OutputThread implements Runnable {
 	private static final Logger LOGGER = Logger.getLogger(OutputThread.class);
 
-	private Configuration config;
 	private Writer out;
 	private final BlockingQueue<String> queue = new LinkedBlockingQueue<String>(1024);
 	private boolean stopping = false;
 
 	public OutputThread() {
-		config = Configuration.getConfiguration();
+		Configuration config = Configuration.getConfiguration();
 
 		try {
 			File file = new File(config.getOutputFilePath());

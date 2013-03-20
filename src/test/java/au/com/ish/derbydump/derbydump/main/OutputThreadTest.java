@@ -14,12 +14,11 @@ public class OutputThreadTest {
 
 	private static final Logger LOGGER = Logger.getLogger(OutputThreadTest.class);
 
-	private static Configuration config;
 	private static final String RESOURCE_DUMP_LOCATION = "./target/writer_test.out";
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-		config = Configuration.getConfiguration();
+		Configuration config = Configuration.getConfiguration();
 		config.setOutputFilePath(new File(RESOURCE_DUMP_LOCATION).getCanonicalPath());
 
 	}

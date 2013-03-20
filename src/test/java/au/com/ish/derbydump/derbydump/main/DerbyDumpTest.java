@@ -28,13 +28,12 @@ public class DerbyDumpTest {
 	private static final int RESOURCE_MAX_BUFFER_SIZE = 200;
 
 	private static DBConnectionManager db;
-	private static Configuration config;
 
 	private static String BIG_CLOB;
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-		config = Configuration.getConfiguration();
+		Configuration config = Configuration.getConfiguration();
 		config.setDerbyDbPath(RESOURCE_DATABASE_PATH);
 		config.setDriverClassName(RESOURCE_DRIVER_NAME);
 		config.setSchemaName(RESOURCE_SCHEMA_NAME);
@@ -68,7 +67,7 @@ public class DerbyDumpTest {
 		ps.setInt(7, 10);
 
 		//Test for CLOB data
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
         String base = "<SampleClobData>";
         for (int i = 0; i < 1000; i++) {
 	        sb.append(base);

@@ -27,7 +27,7 @@ public class Table {
 	 */
 	public String getSelectQuery(String schema) {
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("SELECT * FROM " + schema + ".");
+		stringBuilder.append("SELECT * FROM ").append(schema).append(".");
 		stringBuilder.append(tableName);
 		return stringBuilder.toString();
 	}
@@ -42,7 +42,7 @@ public class Table {
 	 */
 	public String getCountQuery(String schema) {
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("SELECT COUNT(*) FROM " + schema + ".");
+		stringBuilder.append("SELECT COUNT(*) FROM ").append(schema).append(".");
 		stringBuilder.append(tableName);
 		return stringBuilder.toString();
 	}

@@ -30,9 +30,9 @@ public class MetadataReader {
         // we're also reading the table name so that a model reader impl can filter manually
         columnsForColumn.add(new MetaDataColumnDescriptor("TABLE_NAME",     Types.VARCHAR));
         columnsForColumn.add(new MetaDataColumnDescriptor("COLUMN_NAME",    Types.VARCHAR));
-        columnsForColumn.add(new MetaDataColumnDescriptor("DATA_TYPE",      Types.INTEGER, new Integer(java.sql.Types.OTHER)));
-        columnsForColumn.add(new MetaDataColumnDescriptor("NUM_PREC_RADIX", Types.INTEGER, new Integer(10)));
-        columnsForColumn.add(new MetaDataColumnDescriptor("DECIMAL_DIGITS", Types.INTEGER, new Integer(0)));
+        columnsForColumn.add(new MetaDataColumnDescriptor("DATA_TYPE",      Types.INTEGER, Types.OTHER));
+        columnsForColumn.add(new MetaDataColumnDescriptor("NUM_PREC_RADIX", Types.INTEGER, 10));
+        columnsForColumn.add(new MetaDataColumnDescriptor("DECIMAL_DIGITS", Types.INTEGER, 0));
         columnsForColumn.add(new MetaDataColumnDescriptor("COLUMN_SIZE",    Types.VARCHAR));
         columnsForColumn.add(new MetaDataColumnDescriptor("IS_NULLABLE",    Types.VARCHAR, "YES"));
         columnsForColumn.add(new MetaDataColumnDescriptor("REMARKS",        Types.VARCHAR));
@@ -66,11 +66,9 @@ public class MetadataReader {
     {
         HashMap<String, Object> values = new HashMap<String, Object>();
 
-        for (Iterator<MetaDataColumnDescriptor> it = columnDescriptors.iterator(); it.hasNext();)
-        {
-            MetaDataColumnDescriptor descriptor = it.next();
-            values.put(descriptor.getName(), descriptor.readColumn(resultSet));
-        }
+	    for (MetaDataColumnDescriptor descriptor : columnDescriptors) {
+		    values.put(descriptor.getName(), descriptor.readColumn(resultSet));
+	    }
         return values;
     }
     
@@ -109,30 +107,22 @@ public class MetadataReader {
     
     List<Column> readColumns(DatabaseMetaData metaData, String tableName) throws SQLException
     {
-        ResultSet columnData = null;
-        try
-        {
-            columnData = metaData.getColumns(null, null,escapeForSearch(metaData, tableName), "%");
-            List<Column> columns = new ArrayList<Column>();
-            while (columnData.next())
-            {
-                Map values = readColumns(columnData, columnsForColumn);
-                columns.add(readColumn(metaData, values));
-            }
-            columnData.close();
-            return columns;
-        }
-        finally
-        {
-            //closeResultSet(columnData);
-        }
+        ResultSet columnData;
+	    columnData = metaData.getColumns(null, null,escapeForSearch(metaData, tableName), "%");
+	    List<Column> columns = new ArrayList<Column>();
+	    while (columnData.next())
+	    {
+	        Map values = readColumns(columnData, columnsForColumn);
+	        columns.add(readColumn(values));
+	    }
+	    columnData.close();
+	    return columns;
     }
     
-    Column readColumn(DatabaseMetaData metaData, Map values) throws SQLException
-    {
+    Column readColumn(Map values) {
         Column column = new Column();
         column.setColumnName((String)values.get("COLUMN_NAME"));
-        column.setColumnDataType(((Integer)values.get("DATA_TYPE")).intValue());
+        column.setColumnDataType((Integer) values.get("DATA_TYPE"));
         //column.setName((String)values.get("COLUMN_NAME"));
         /*column.setDefaultValue((String)values.get("COLUMN_DEF"));
         column.setTypeCode(((Integer)values.get("DATA_TYPE")).intValue());
@@ -173,11 +163,11 @@ public class MetadataReader {
 */        return column;
     }
     
-    public String escapeForSearch(DatabaseMetaData metaData, String literalString) throws SQLException
+    String escapeForSearch(DatabaseMetaData metaData, String literalString) throws SQLException
     {
         String escape = metaData.getSearchStringEscape();
 
-        if (escape == "")
+        if (escape.equals(""))
         {
             // No escape string, so nothing to do...
             return literalString;
@@ -185,7 +175,7 @@ public class MetadataReader {
         else
         {
             // with Java 5, we would just use Matcher.quoteReplacement
-            StringBuffer quotedEscape = new StringBuffer();
+            StringBuilder quotedEscape = new StringBuilder();
 
             for (int idx = 0; idx < escape.length(); idx++)
             {

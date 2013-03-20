@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class DatabaseReader implements Runnable {
 
-	public final static String SEPARATOR = ",";
+	private final static String SEPARATOR = ",";
 	private final static int MAX_ALLOWED_ROWS = 100; 
 	private static final Logger LOGGER = Logger.getLogger(DatabaseReader.class);
 	private final OutputThread output;
@@ -34,7 +34,7 @@ public class DatabaseReader implements Runnable {
 		config = Configuration.getConfiguration();
 	}
 
-	public void readMetaData(String schema) {
+	void readMetaData(String schema) {
 		// getting the connection
 		DBConnectionManager db;
 		try {
@@ -48,13 +48,13 @@ public class DatabaseReader implements Runnable {
 		LOGGER.debug("Resolving database structure...");
 		Database database = metadata.readDatabase(db.getConnection());
 		getInternalData(database.getTables(), db.getConnection(), schema);
-		if (db != null) {
-			try {
-				db.getConnection().close();
-			} catch (SQLException e) {
-				LOGGER.error("Could not close database connection :" + e.getErrorCode() + " - " + e.getMessage());
-			}
+
+		try {
+			db.getConnection().close();
+		} catch (SQLException e) {
+			LOGGER.error("Could not close database connection :" + e.getErrorCode() + " - " + e.getMessage());
 		}
+
 	}
 
 	/**
@@ -96,8 +96,8 @@ public class DatabaseReader implements Runnable {
 				int counter = 0;
 				while (resultSet.next()) {
 					if (counter == 0) {
-						initTableInsert.append("LOCK TABLES `" + tableName + "` WRITE;\n");
-						initTableInsert.append("INSERT INTO " + tableName + " ");
+						initTableInsert.append("LOCK TABLES `").append(tableName).append("` WRITE;\n");
+						initTableInsert.append("INSERT INTO ").append(tableName).append(" ");
 						for (int c_index = 0; c_index < numOfColumns; c_index++) {
 							//String columnName = columns.get(c_index).getColumnName();
 							if (c_index == 0) {
@@ -243,7 +243,7 @@ public class DatabaseReader implements Runnable {
 	 * @param binaryData
 	 * @return String representation of binary data
 	 */
-	public String processBinaryData(byte[] binaryData) {
+	String processBinaryData(byte[] binaryData) {
 		if (binaryData == null) {
 			return null;
 		}
@@ -256,7 +256,7 @@ public class DatabaseReader implements Runnable {
 	 * @param data
 	 * @return String representation of Clob.
 	 */
-	public String processClobData(Clob data) {
+	String processClobData(Clob data) {
 		if (data == null)
 			return null;
 		StringBuilder sb = new StringBuilder();
