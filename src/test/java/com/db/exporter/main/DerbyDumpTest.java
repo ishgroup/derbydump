@@ -2,20 +2,18 @@ package com.db.exporter.main;
 
 import com.db.exporter.config.Configuration;
 import com.db.exporter.utils.DBConnectionManager;
-import com.db.exporter.utils.HexUtils;
 import com.db.exporter.utils.StringUtils;
 import com.db.exporter.writer.BufferManager;
 import com.db.exporter.writer.DatabaseReader;
 import com.db.exporter.writer.FileWriter;
+import org.apache.commons.codec.CharEncoding;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.nio.charset.Charset;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -25,6 +23,8 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
 public class DerbyDumpTest {
+
+	private static final Logger LOGGER = Logger.getLogger(DerbyDumpTest.class);
 
 	private static final String TABLE_NAME = "DumperTest";
 	private static final String RESOURCE_DATABASE_PATH = "memory:testdb";
@@ -128,16 +128,23 @@ public class DerbyDumpTest {
 	
 	@Test
 	public void testHexUtils(){
-	    String expected = "48657820537472696E67203D3D3B3930252423405E2042797465204172726179";
-	    String test = "Hex String ==;90%$#@^ Byte Array";
-	    byte[] bytes = test.getBytes();
-	    String actual = HexUtils.bytesToString(bytes);
-	    assertEquals("failure In converting byte to HEX",expected, actual);
-	    String chineseString = "中國全國人大、政協「兩會」綜合報導 Read more:";
-	    String expectedChi = "E4B8ADE59C8BE585A8E59C8BE4BABAE5A4A7E38081E694BFE58D94E3808CE585A9E69C83E3808DE7B69CE59088E5A0B1E5B08E2052656164206D6F72653A";
-	    byte[] bytesChi = chineseString.getBytes(Charset.forName("UTF-8"));
-	    String actualChi = HexUtils.bytesToString(bytesChi);
-	    assertEquals("failure In converting byte to HEX For Chinese",expectedChi, actualChi);
+		Hex hexEncoder = new Hex(CharEncoding.UTF_8);
+
+		try {
+			byte[] test1 = "Hex String ==;90%$#@^ Byte Array".getBytes(CharEncoding.UTF_8);
+			byte[] test1_expected = "48657820537472696e67203d3d3b3930252423405e2042797465204172726179".getBytes(CharEncoding.UTF_8);
+
+			byte[] test1_output = hexEncoder.encode(test1);
+			LOGGER.debug("Hex output: " + new String(test1_output));
+			assertEquals("failure In converting byte to HEX", new String(test1_expected).toUpperCase(), new String(test1_output).toUpperCase());
+
+			byte[] test2 = "中國全國人大、政協「兩會」綜合報導 Read more:".getBytes(CharEncoding.UTF_8);
+			byte[] test2_expected = "E4B8ADE59C8BE585A8E59C8BE4BABAE5A4A7E38081E694BFE58D94E3808CE585A9E69C83E3808DE7B69CE59088E5A0B1E5B08E2052656164206D6F72653A".getBytes(CharEncoding.UTF_8);
+
+			byte[] test2_output = hexEncoder.encode(test2);
+		    assertEquals("failure In converting byte to HEX For Chinese", new String(test2_expected).toUpperCase(), new String(test2_output).toUpperCase());
+
+		} catch (UnsupportedEncodingException ignored) {}
 	}
 	
 	@AfterClass

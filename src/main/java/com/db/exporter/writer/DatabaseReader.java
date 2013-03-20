@@ -6,8 +6,9 @@ import com.db.exporter.beans.Table;
 import com.db.exporter.config.Configuration;
 import com.db.exporter.reader.impl.MetadataReader;
 import com.db.exporter.utils.DBConnectionManager;
-import com.db.exporter.utils.HexUtils;
 import com.db.exporter.utils.StringUtils;
+import org.apache.commons.codec.CharEncoding;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
@@ -259,11 +260,12 @@ public class DatabaseReader implements Runnable {
 	 * @return String representation of binary data
 	 */
 	public String processBinaryData(byte[] binaryData) {
-		if (binaryData == null)
+		if (binaryData == null) {
 			return null;
-		String data = HexUtils.bytesToString(binaryData);
-		data = "'" + data + "'";
-		return data;
+		}
+
+		Hex hexEncoder = new Hex(CharEncoding.UTF_8);
+		return  "'" + new String(hexEncoder.encode(binaryData)) + "'";
 	}
 
 	/**
