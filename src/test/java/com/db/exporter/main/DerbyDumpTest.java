@@ -100,7 +100,7 @@ public class DerbyDumpTest {
 		writer.join();
 
 		// Now let's read the output and see what is in it
-		BufferedReader r = new BufferedReader(new FileReader(new File(RESOURCE_DUMP_LOCATION).getCanonicalPath()));
+		BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(new File(RESOURCE_DUMP_LOCATION).getCanonicalPath()),"UTF-8"));
 		StringBuilder data = new StringBuilder();
 		try {
 			String line = r.readLine();
