@@ -3,9 +3,8 @@ package com.db.exporter.main;
 import com.db.exporter.config.Configuration;
 import com.db.exporter.utils.DBConnectionManager;
 import com.db.exporter.utils.StringUtils;
-import com.db.exporter.writer.BufferManager;
 import com.db.exporter.writer.DatabaseReader;
-import com.db.exporter.writer.FileWriter;
+import com.db.exporter.writer.OutputThread;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
@@ -33,10 +32,10 @@ public class DerbyDumpTest {
 	private static final String RESOURCE_DUMP_LOCATION = "./target/test.sql";
 	private static final int RESOURCE_MAX_BUFFER_SIZE = 200;
 
-	private static StringBuilder GOOD_QUERY = new StringBuilder("LOCK TABLES `DUMPERTEST` WRITE;\nINSERT INTO DUMPERTEST (ID, DES, TIME, NULLTIME, TYPE, LOCATION, ALERT, CLOBDATA) VALUES \n(1,'TestData','1970-01-01',null,'漢字',10,10");
-
 	private static Connection connection;
 	private static Configuration config;
+
+	private static String BIG_CLOB;
 
 	@BeforeClass
 	public static void setUp() throws Exception {
@@ -75,46 +74,57 @@ public class DerbyDumpTest {
 		ps.setString(5, "漢字");
 		ps.setInt(6, 10);
 		ps.setInt(7, 10);
+
 		//Test for CLOB data
-		StringBuffer sb = new StringBuffer ();
+		StringBuffer sb = new StringBuffer();
         String base = "<SampleClobData>";
         for (int i = 0; i < 1000; i++) {
-            sb.append (base);
+	        sb.append(base);
         }
-        //insert a large enough data to ensure stream is created in dvd
-        ps.setClob(8, new StringReader(sb.toString()), sb.length());
-        //ps.setCharacterStream (8, new StringReader(sb.toString()), sb.length());
+		BIG_CLOB = sb.toString();
+
+        ps.setClob(8, new StringReader(BIG_CLOB), BIG_CLOB.length());
 		ps.execute();
 		connection.commit();
 		ps.close();
-		GOOD_QUERY.append(",'"+sb+"'");
-		GOOD_QUERY.append(");\nUNLOCK TABLES;");
 	}
 
 	@Test
 	public void test() throws Exception {
-		Thread reader = new Thread(new DatabaseReader(config,
-				BufferManager.getBufferInstance()), "Database_reader");
-		Thread writer = new Thread(new FileWriter(config,
-				BufferManager.getBufferInstance()), "File_Writer");
+
+		OutputThread output = new OutputThread();
+
+		Thread reader = new Thread(new DatabaseReader(output), "Database_reader");
+		Thread writer = new Thread(output, "writer test");
 
 		reader.start();
 		writer.start();
 
-		Thread.sleep(2000);
-		File file = new File(config.getOutputFilePath());
+		// Now let's wait for the reader to finish
+		reader.join();
 
-		StringBuilder sb = new StringBuilder();
+		// And let the writer know that no more data is coming
+		writer.interrupt();
+		writer.join();
 
-		InputStreamReader r = new InputStreamReader(new FileInputStream(file), "UTF-8");
-		char[] buffer = new char[1024];
-		while ((r.read(buffer, 0, 1024)) > -1) {
-			sb.append(buffer);
+		// Now let's read the output and see what is in it
+		BufferedReader r = new BufferedReader(new FileReader(new File(RESOURCE_DUMP_LOCATION).getCanonicalPath()));
+		StringBuilder data = new StringBuilder();
+		try {
+			String line = r.readLine();
+			while (line != null) {
+				data.append(line);
+				data.append("\n");
+				line = r.readLine();
+			}
+		} finally {
+			r.close();
 		}
 
-		assertTrue("Error creating dump: ", file.exists() && file.length() > 0);
-		assertTrue("Wrong dump created", sb.toString().contains(GOOD_QUERY));
-		r.close();
+		assertTrue("Wrong dump created: LOCK missing", data.toString().contains("LOCK TABLES `DUMPERTEST` WRITE"));
+		assertTrue("Wrong dump created: INSERT missing", data.toString().contains("INSERT INTO DUMPERTEST (ID, DES, TIME, NULLTIME, TYPE, LOCATION, ALERT, CLOBDATA) VALUES"));
+		assertTrue("Wrong dump created: VALUES missing", data.toString().contains("1,'TestData','1970-01-01',,'漢字'"));
+		assertTrue("Wrong dump created: CLOB", data.toString().contains(BIG_CLOB));
 	}
 	
 	@Test
@@ -135,7 +145,6 @@ public class DerbyDumpTest {
 			byte[] test1_expected = "48657820537472696e67203d3d3b3930252423405e2042797465204172726179".getBytes(CharEncoding.UTF_8);
 
 			byte[] test1_output = hexEncoder.encode(test1);
-			LOGGER.debug("Hex output: " + new String(test1_output));
 			assertEquals("failure In converting byte to HEX", new String(test1_expected).toUpperCase(), new String(test1_output).toUpperCase());
 
 			byte[] test2 = "中國全國人大、政協「兩會」綜合報導 Read more:".getBytes(CharEncoding.UTF_8);
@@ -149,7 +158,6 @@ public class DerbyDumpTest {
 	
 	@AfterClass
 	public static void cleanUp() throws Exception {
-		new File(RESOURCE_DUMP_LOCATION).delete();
 		connection.close();
 	}
 }

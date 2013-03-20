@@ -1,29 +1,16 @@
 package com.db.exporter.main;
 
 import com.db.exporter.config.Configuration;
-import com.db.exporter.writer.BufferManager;
 import com.db.exporter.writer.DatabaseReader;
-import com.db.exporter.writer.FileWriter;
+import com.db.exporter.writer.OutputThread;
 import org.apache.log4j.Logger;
 
 
 public class DerbyDump {
 	
-	public static long startTime;
 	private static final Logger LOGGER = Logger.getLogger(DerbyDump.class);
 	
 	public static void main(String[] args) {
-		try {
-			startTime = System.currentTimeMillis();
-			/*
-			 * Usage instructions:
-			 * 
-			 * Step 1 :Set up the dump.properties.
-			 * Step 2 :Start a reader thread.
-			 * Step 3 :Start a writer thread.
-			 * 
-			 * After dump has been created the threads will kill themselves.
-			 */
 
 			Configuration config = Configuration.getConfiguration();
 
@@ -35,17 +22,24 @@ public class DerbyDump {
 			LOGGER.debug("\tschema =" + config.getSchemaName());
 			LOGGER.debug("\tbuffer size =" + config.getBufferMaxSize());
 			LOGGER.debug("\toutput file path =" + config.getOutputFilePath());
-			
-			Thread reader = new Thread(new DatabaseReader(config, BufferManager.getBufferInstance()), "Database_reader");
-			Thread writer = new Thread(new FileWriter(config, BufferManager.getBufferInstance()), "File_Writer");
+
+			OutputThread output = new OutputThread();
+
+			Thread reader = new Thread(new DatabaseReader(output), "Database_reader");
+			Thread writer = new Thread(output, "File_Writer");
 			
 			reader.start();
 			writer.start();
-			
-		} catch (Exception e) {
-			LOGGER.debug("Failed execution: "+ e.getMessage());
-			LOGGER.debug("Use -help for usage or check readMe for default configuration");
-			
-		}
+
+		try {
+			// Now let's wait for the reader to finish
+			reader.join();
+
+			// And let the writer know that no more data is coming
+			writer.interrupt();
+			writer.join();
+
+		} catch (InterruptedException ignored) {}
+
 	}	
 }
