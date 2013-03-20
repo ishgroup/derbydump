@@ -1,10 +1,9 @@
-package com.db.exporter.writer;
+package com.db.exporter.main;
 
-import com.db.exporter.beans.Column;
-import com.db.exporter.beans.Database;
-import com.db.exporter.beans.Table;
+import com.db.exporter.metadata.Column;
+import com.db.exporter.metadata.Database;
+import com.db.exporter.metadata.Table;
 import com.db.exporter.config.Configuration;
-import com.db.exporter.reader.impl.MetadataReader;
 import com.db.exporter.utils.DBConnectionManager;
 import com.db.exporter.utils.StringUtils;
 import org.apache.commons.codec.CharEncoding;

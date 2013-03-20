@@ -1,4 +1,4 @@
-package com.db.exporter.beans;
+package com.db.exporter.metadata;
 
 import java.util.ArrayList;
 import java.util.List;

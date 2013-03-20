@@ -1,4 +1,4 @@
-package com.db.exporter.writer;
+package com.db.exporter.main;
 
 import com.db.exporter.config.Configuration;
 import org.apache.log4j.Logger;

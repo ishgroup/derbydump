@@ -3,8 +3,6 @@ package com.db.exporter.main;
 import com.db.exporter.config.Configuration;
 import com.db.exporter.utils.DBConnectionManager;
 import com.db.exporter.utils.StringUtils;
-import com.db.exporter.writer.DatabaseReader;
-import com.db.exporter.writer.OutputThread;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
@@ -20,6 +18,7 @@ import java.sql.Statement;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 
 public class DerbyDumpTest {
 
@@ -153,7 +152,9 @@ public class DerbyDumpTest {
 			byte[] test2_output = hexEncoder.encode(test2);
 		    assertEquals("failure In converting byte to HEX For Chinese", new String(test2_expected).toUpperCase(), new String(test2_output).toUpperCase());
 
-		} catch (UnsupportedEncodingException ignored) {}
+		} catch (UnsupportedEncodingException ignored) {
+			fail("UnsupportedEncodingException");
+		}
 	}
 	
 	@AfterClass
