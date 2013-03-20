@@ -30,7 +30,8 @@ public class OutputThread implements Runnable {
 
 			file.createNewFile();
 
-			out = new BufferedWriter(new FileWriter(file), config.getBufferMaxSize() * 1024);
+			out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),"UTF-8"), config.getBufferMaxSize() * 1024);
+
 		} catch (IOException e) {
 			LOGGER.error("Could not write to the file " + config.getOutputFilePath());
 		}
