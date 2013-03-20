@@ -2,7 +2,6 @@ package com.db.exporter.beans;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -14,7 +13,6 @@ public class Database {
 
 	private String databaseName;
 	private List<Table> tables = new ArrayList<Table>();
-	private Map<String, List<String>> dataMap;
 
 	/**
 	 * @return the tables
@@ -32,13 +30,6 @@ public class Database {
     }
 
 	/**
-	 * @param tables the tables to set
-	 */
-	public void setTables(List<Table> tables) {
-		this.tables = tables;
-	}
-
-	/**
 	 * @return the databaseName
 	 */
 	public String getDatabaseName() {
@@ -52,19 +43,4 @@ public class Database {
 		this.databaseName = databaseName;
 	}
 
-	/**
-	 * @return the dataMap
-	 */
-	public Map<String, List<String>> getDataMap() {
-		return dataMap;
-	}
-
-	/**
-	 * @param dataMap the dataMap to set
-	 */
-	public void setDataMap(Map<String, List<String>> dataMap) {
-		this.dataMap = dataMap;
-	}
-	
-	
 }
