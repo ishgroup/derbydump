@@ -1,8 +1,6 @@
 package com.db.exporter.writer;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 
 import org.apache.log4j.Logger;
 
@@ -36,7 +34,12 @@ public class FileWriter implements Runnable {
 		Writer streamWriter = null;
 		try {
 			File file = new File(m_config.getDumpFilePath());
-			streamWriter = IOUtils.getOutputStream(file);
+
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			streamWriter = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+
 			synchronized (BufferManager.BUFFER_TOKEN) {
 				while (!BufferManager.isReadingComplete()) {
 					if (!Thread.interrupted()) {
@@ -50,7 +53,7 @@ public class FileWriter implements Runnable {
 						if (m_buffer.size() == 0) {
 							break;
 						}
-						IOUtils.write(streamWriter, m_buffer);
+						streamWriter.append(m_buffer.flush());
 						streamWriter.flush();
 						BufferManager.BUFFER_TOKEN.notify();
 					}
