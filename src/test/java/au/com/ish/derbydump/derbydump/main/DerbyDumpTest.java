@@ -124,7 +124,7 @@ public class DerbyDumpTest {
 
 		assertTrue("Wrong dump created: LOCK missing", data.toString().contains("LOCK TABLES `DUMPERTEST` WRITE"));
 		assertTrue("Wrong dump created: INSERT missing", data.toString().contains("INSERT INTO DUMPERTEST (ID,DES,TIME,NULLTIME,TYPE,LOCATION,ALERT,CLOBDATA) VALUES"));
-		assertTrue("Wrong dump created: VALUES missing", data.toString().contains("1,'TestData','1970-01-01',,'漢字'"));
+		assertTrue("Wrong dump created: VALUES missing", data.toString().contains("1,'TestData','1970-01-01',NULL,'漢字'"));
 		assertTrue("Wrong dump created: CLOB", data.toString().contains(BIG_CLOB));
 	}
 

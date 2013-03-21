@@ -112,70 +112,72 @@ public class DatabaseReader {
 							case Types.BINARY:
 							case Types.VARBINARY:
 							case Types.BLOB: {
-								byte[] bytes = dataRows.getBytes(columnName);
-								outputSQL.append(bytes == null ? "" : processBinaryData(bytes));
+								byte[] obj = dataRows.getBytes(columnName);
+								outputSQL.append(obj == null ? "NULL" : processBinaryData(obj));
 								break;
 							}
 							case Types.CLOB: {
-								Clob clob = dataRows.getClob(columnName);
-								outputSQL.append(clob == null ? "" : processClobData(clob));
+								Clob obj = dataRows.getClob(columnName);
+								outputSQL.append(obj == null ? "NULL" : processClobData(obj));
 								break;
 							}
 							case Types.CHAR:
 							case Types.LONGNVARCHAR:
 							case Types.VARCHAR: {
-								String stringData = dataRows.getString(columnName);
-								outputSQL.append(processStringData(stringData));
+								String obj = dataRows.getString(columnName);
+								outputSQL.append(obj == null ? "NULL" : processStringData(obj));
 								break;
 							}
 							case Types.TIME: {
 								Time obj = dataRows.getTime(columnName);
-								String timeData = obj == null ? null : obj.toString();
-								outputSQL.append(processStringData(timeData));
+								outputSQL.append(obj == null ? "NULL" : processStringData(obj.toString()));
 								break;
 							}
 							case Types.DATE: {
 								Date obj = dataRows.getDate(columnName);
-								String dateData = obj == null ? null : obj.toString();
-								outputSQL.append(processStringData(dateData));
+								outputSQL.append(obj == null ? "NULL" : processStringData(obj.toString()));
 								break;
 							}
 							case Types.TIMESTAMP: {
 								Timestamp obj = dataRows.getTimestamp(columnName);
-								String stringData = obj == null ? null : obj.toString();
-								outputSQL.append(processStringData(stringData));
+								outputSQL.append(obj == null ? "NULL" : processStringData(obj.toString()));
 								break;
 							}
-							case Types.SMALLINT:
-								Short shortData = dataRows.getShort(columnName);
-								outputSQL.append(shortData == null ? null : String.valueOf(shortData));
+							case Types.SMALLINT: {
+								Object obj = dataRows.getObject(columnName);
+								outputSQL.append(obj == null ? "NULL" : obj.toString());
 								break;
-							case Types.BIGINT:
-								Long longData = dataRows.getLong(columnName);
-								outputSQL.append(longData == null ? null : String.valueOf(longData));
+							}
+							case Types.BIGINT: {
+								Long obj = dataRows.getLong(columnName);
+								outputSQL.append(obj == null ? "NULL" : obj.toString());
 								break;
+							}
 							case Types.INTEGER: {
-								int data = dataRows.getInt(columnName);
-								outputSQL.append(String.valueOf(data));
+								Object obj = dataRows.getObject(columnName);
+								outputSQL.append(obj == null ? "NULL" : obj.toString());
 								break;
 							}
 							case Types.NUMERIC:
-							case Types.DECIMAL:
-								BigDecimal decimalData = dataRows.getBigDecimal(columnName);
-								outputSQL.append(decimalData == null ? null : String.valueOf(decimalData));
+							case Types.DECIMAL: {
+								BigDecimal obj = dataRows.getBigDecimal(columnName);
+								outputSQL.append(obj == null ? "NULL" : String.valueOf(obj));
 								break;
+							}
 							case Types.REAL:
-							case Types.FLOAT:
-								Float floatData = dataRows.getFloat(columnName);
-								outputSQL.append(floatData == null ? null : String.valueOf(floatData));
+							case Types.FLOAT: {
+								Float obj = dataRows.getFloat(columnName);
+								outputSQL.append(obj == null ? "NULL" : String.valueOf(obj));
 								break;
-							case Types.DOUBLE:
-								Double doubleData = dataRows.getDouble(columnName);
-								outputSQL.append(doubleData == null ? null : String.valueOf(doubleData));
+							}
+							case Types.DOUBLE: {
+								Double obj = dataRows.getDouble(columnName);
+								outputSQL.append(obj == null ? "NULL" : String.valueOf(obj));
 								break;
+							}
 							default: {
-								Object object = dataRows.getObject(columnName);
-								outputSQL.append(object == null ? null : object.toString());
+								Object obj = dataRows.getObject(columnName);
+								outputSQL.append(obj == null ? "NULL" : obj.toString());
 							}
 						}
 						outputSQL.append(",");
