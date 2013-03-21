@@ -48,7 +48,7 @@ public class DatabaseReader {
 		this.output = output;
 		config = Configuration.getConfiguration();
 
-		LOGGER.debug("Database reader intializing...");
+		LOGGER.debug("Database reader initializing...");
 		readMetaData(config.getSchemaName());
 	}
 
@@ -183,7 +183,7 @@ public class DatabaseReader {
 					outputSQL.deleteCharAt(outputSQL.length()-1); //remove the last comma
 					outputSQL.append("),\n");
 
-					if (rowCount % MAX_ALLOWED_ROWS == 0) {
+					if (!dataRows.last() && rowCount % MAX_ALLOWED_ROWS == 0) {
 						outputSQL.deleteCharAt(outputSQL.length()-1); //remove the last comma
 						outputSQL.append(";\n");
 						outputSQL.append(table.getInsertSQL());
