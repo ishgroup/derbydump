@@ -64,14 +64,25 @@ public class Table {
 	}
 
 	/**
-	 * @return Returns a string containing Unlocking statement for table
+	 * Get the SQL for the INSERT statement (without any of the data values)
+	 *
+	 * @return
 	 */
-	public String getUnLockStatement() {
-		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("UNLOCK TABLES;");
-		return stringBuilder.toString();
-	}
+	public String getInsertSQL() {
+		StringBuilder output = new StringBuilder();
 
+		output.append("INSERT INTO ").append(getTableName()).append(" (");
+
+		for (Column c : getColumns()) {
+			output.append(c.getColumnName());
+			output.append(",");
+		}
+
+		output.deleteCharAt(output.length()-1); //remove the last comma
+		output.append(") VALUES ");
+
+		return output.toString();
+	}
 
 	/**
 	 * @return the columns

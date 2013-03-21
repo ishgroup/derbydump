@@ -38,8 +38,7 @@ import java.util.List;
  */
 public class DatabaseReader {
 
-	private final static String SEPARATOR = ",";
-	private final static int MAX_ALLOWED_ROWS = 100; 
+	private final static int MAX_ALLOWED_ROWS = 100;
 	private static final Logger LOGGER = Logger.getLogger(DatabaseReader.class);
 	private final OutputThread output;
 
@@ -78,184 +77,135 @@ public class DatabaseReader {
 
 	/**
 	 * Read data from every {@link Table} present in the database and add it to
-	 * the queue.
+	 * the output.
 	 * 
 	 * @param tables
 	 * @param connection
 	 */
-	private void getInternalData(List<Table> tables, Connection connection,
-			String schema) {
+	private void getInternalData(List<Table> tables, Connection connection, String schema) {
 		LOGGER.debug("Fetching database data...");
 
-		Statement statement = null;
-		ResultSet resultSet = null;
-		
 		output.add("SET FOREIGN_KEY_CHECKS = 0;\n");
-		// Iterating over the list of the tables
+
 		for (Table table : tables) {
-
-			//Flag for reading end of table
-			boolean t_flag = false;
-			StringBuilder initTableInsert = new StringBuilder();
-			// picking a table at index
-
-			// fetching the attributes of the table
-			String tableName = table.getTableName();
 			List<Column> columns = table.getColumns();
-			int numOfColumns = columns.size();
-			// constructing the select query
-			String selectQuery = table.getSelectQuery(schema);
-			String countQuery = table.getCountQuery(schema);
+
 			try {
-				statement = connection.createStatement();
-				resultSet = statement.executeQuery(countQuery);
-				resultSet.next();
-				int numOfRows = resultSet.getInt(1);
-				resultSet = statement.executeQuery(selectQuery);
-				int counter = 0;
-				while (resultSet.next()) {
-					if (counter == 0) {
-						initTableInsert.append("LOCK TABLES `").append(tableName).append("` WRITE;\n");
-						initTableInsert.append("INSERT INTO ").append(tableName).append(" ");
-						for (int c_index = 0; c_index < numOfColumns; c_index++) {
-							//String columnName = columns.get(c_index).getColumnName();
-							if (c_index == 0) {
-								initTableInsert.append("(");
-							}
-							initTableInsert.append(columns.get(c_index).getColumnName());
-							if (c_index == numOfColumns - 1) {
-								initTableInsert.append(") VALUES \n");
-							} else {
-								initTableInsert.append(", ");
-							}
-						}
-						output.add(initTableInsert.toString());
-					}
-					// TODO Logic needs to be refined for end of table data.
-					if (counter == numOfRows - 1)
-						t_flag = true;
-					output.add("(");
-					for (int c_index = 0; c_index < numOfColumns; c_index++) {
-						if (c_index > 0) {
-							output.add(SEPARATOR);
-						}
-						Column column = columns.get(c_index);
+				Statement statement = connection.createStatement();
+				ResultSet dataRows = statement.executeQuery(table.getSelectQuery(schema));
+				int rowCount = 0;
+
+				StringBuilder outputSQL = new StringBuilder();
+
+				outputSQL.append("LOCK TABLES `" + table.getTableName() + "` WRITE;\n");
+				outputSQL.append(table.getInsertSQL());
+
+				while (dataRows.next()) {
+
+					outputSQL.append("(");
+					for (Column column : columns) {
+
 						String columnName = column.getColumnName();
 						int columnType = column.getColumnDataType();
 						switch (columnType) {
 							case Types.BINARY:
 							case Types.VARBINARY:
 							case Types.BLOB: {
-								byte[] bytes = resultSet.getBytes(columnName);
-								output.add(bytes == null ? null : processBinaryData(bytes));
+								byte[] bytes = dataRows.getBytes(columnName);
+								outputSQL.append(bytes == null ? "" : processBinaryData(bytes));
 								break;
 							}
 							case Types.CLOB: {
-								Clob clob = resultSet.getClob(columnName);
-								output.add(clob == null ? null : processClobData(clob));
+								Clob clob = dataRows.getClob(columnName);
+								outputSQL.append(clob == null ? "" : processClobData(clob));
 								break;
 							}
 							case Types.CHAR:
 							case Types.LONGNVARCHAR:
 							case Types.VARCHAR: {
-								String stringData = resultSet.getString(columnName);
-								output.add(processStringData(stringData));
+								String stringData = dataRows.getString(columnName);
+								outputSQL.append(processStringData(stringData));
 								break;
 							}
 							case Types.TIME: {
-								Time obj = resultSet.getTime(columnName);
-								String timeData = obj == null ? null : obj
-										.toString();
-								output.add(processStringData(timeData));
+								Time obj = dataRows.getTime(columnName);
+								String timeData = obj == null ? null : obj.toString();
+								outputSQL.append(processStringData(timeData));
 								break;
 							}
 							case Types.DATE: {
-								Date obj = resultSet.getDate(columnName);
-								String dateData = obj == null ? null : obj
-										.toString();
-								output.add(processStringData(dateData));
+								Date obj = dataRows.getDate(columnName);
+								String dateData = obj == null ? null : obj.toString();
+								outputSQL.append(processStringData(dateData));
 								break;
 							}
 							case Types.TIMESTAMP: {
-								Timestamp obj = resultSet.getTimestamp(columnName);
-								String stringData = obj == null ? null : obj
-										.toString();
-								output.add(processStringData(stringData));
+								Timestamp obj = dataRows.getTimestamp(columnName);
+								String stringData = obj == null ? null : obj.toString();
+								outputSQL.append(processStringData(stringData));
 								break;
 							}
 							case Types.SMALLINT:
-								Short shortData = resultSet.getShort(columnName);
-								output.add(shortData == null ? null : String
-										.valueOf(shortData));
+								Short shortData = dataRows.getShort(columnName);
+								outputSQL.append(shortData == null ? null : String.valueOf(shortData));
 								break;
 							case Types.BIGINT:
-								Long longData = resultSet.getLong(columnName);
-								output.add(longData == null ? null : String
-										.valueOf(longData));
+								Long longData = dataRows.getLong(columnName);
+								outputSQL.append(longData == null ? null : String.valueOf(longData));
 								break;
 							case Types.INTEGER: {
-								int data = resultSet.getInt(columnName);
-								output.add(String.valueOf(data));
+								int data = dataRows.getInt(columnName);
+								outputSQL.append(String.valueOf(data));
 								break;
 							}
 							case Types.NUMERIC:
 							case Types.DECIMAL:
-								BigDecimal decimalData = resultSet
-										.getBigDecimal(columnName);
-								output.add(decimalData == null ? null : String
-										.valueOf(decimalData));
+								BigDecimal decimalData = dataRows.getBigDecimal(columnName);
+								outputSQL.append(decimalData == null ? null : String.valueOf(decimalData));
 								break;
 							case Types.REAL:
 							case Types.FLOAT:
-								Float floatData = resultSet.getFloat(columnName);
-								output.add(floatData == null ? null : String
-										.valueOf(floatData));
+								Float floatData = dataRows.getFloat(columnName);
+								outputSQL.append(floatData == null ? null : String.valueOf(floatData));
 								break;
 							case Types.DOUBLE:
-								Double doubleData = resultSet.getDouble(columnName);
-								output.add(doubleData == null ? null : String
-										.valueOf(doubleData));
+								Double doubleData = dataRows.getDouble(columnName);
+								outputSQL.append(doubleData == null ? null : String.valueOf(doubleData));
 								break;
 							default: {
-								Object object = resultSet.getObject(columnName);
-								output.add(object == null ? null : object
-										.toString());
+								Object object = dataRows.getObject(columnName);
+								outputSQL.append(object == null ? null : object.toString());
 							}
 						}
+						outputSQL.append(",");
 					}
-					counter++;
-					output.add(");\n");
+					rowCount++;
+					outputSQL.deleteCharAt(outputSQL.length()-1); //remove the last comma
+					outputSQL.append("),\n");
 
-					if (!t_flag && counter % MAX_ALLOWED_ROWS != 0) {
-
-					} else if (!t_flag) {
-						output.add(table.getUnLockStatement() + "\n");
-						output.add(initTableInsert.toString());
-					} else {
-						output.add(table.getUnLockStatement() + "\n");
+					if (rowCount % MAX_ALLOWED_ROWS == 0) {
+						outputSQL.deleteCharAt(outputSQL.length()-1); //remove the last comma
+						outputSQL.append(";\n");
+						outputSQL.append(table.getInsertSQL());
 					}
 				}
+
+				outputSQL.deleteCharAt(outputSQL.length()-1); //remove the last comma
+				outputSQL.append(";\n");
+
+				outputSQL.append("UNLOCK TABLES;\n");
+
+				output.add(outputSQL.toString());
+
+				dataRows.close();
+				statement.close();
+
 			} catch (SQLException e) {
 				LOGGER.error("Error: " + e.getErrorCode() + " - " + e.getMessage());
-			} finally {
-				if (resultSet != null)
-					try {
-						resultSet.close();
-					} catch (SQLException e1) {
-						LOGGER.error("Could not close the resultset :" + e1.getErrorCode() + " - " + e1.getMessage());
-					}
-				if (statement != null)
-					try {
-						statement.close();
-					} catch (SQLException e) {
-						LOGGER.error("Could not close the statement :" + e.getErrorCode() + " - " + e.getMessage());
-					}
 			}
-		}
 		output.add("SET FOREIGN_KEY_CHECKS = 1;");
 		LOGGER.debug("Reading done.");
-
-		Thread.currentThread().interrupt();
+		}
 	}
 
 	/**
@@ -264,7 +214,7 @@ public class DatabaseReader {
 	 */
 	String processBinaryData(byte[] binaryData) {
 		if (binaryData == null) {
-			return null;
+			return "";
 		}
 
 		Hex hexEncoder = new Hex(CharEncoding.UTF_8);
@@ -277,7 +227,8 @@ public class DatabaseReader {
 	 */
 	String processClobData(Clob data) {
 		if (data == null)
-			return null;
+			return "";
+
 		StringBuilder sb = new StringBuilder();
 		try {
 			Reader reader = data.getCharacterStream();
@@ -304,7 +255,7 @@ public class DatabaseReader {
 	 */
 	private String processStringData(String data) {
 		if (data == null)
-			return null;
+			return "";
 
 		data = escapeQuotes(data.trim());
 		data = "'" + data + "'";
