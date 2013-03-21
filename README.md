@@ -1,7 +1,16 @@
 # derbydump
 
 
-Derby SQL dump. This project will take a Derby database and export it to a file, suitable for importing to mysql (or probabably some other SQL compliance database).
+Derby SQL dump. This project will take a Derby database and export the data in it to a file. It is similar, but not feature parity, to the mysqldump executable.
+
+## Features
+
+* Export any Derby data to an SQL file
+* Resulting file is suitable to import to mysql and possibly other databases
+* Export from local Derby files or running Derby server
+* Optionally transform the table names (for example to correct case sensitive names in mysql)
+* Handles binary data and clob
+* Handles UTF data
 
 ## How to use
 
