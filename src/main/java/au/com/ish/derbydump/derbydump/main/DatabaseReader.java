@@ -89,6 +89,7 @@ public class DatabaseReader {
 
 		for (Table table : tables) {
 			List<Column> columns = table.getColumns();
+			LOGGER.info("Table " + table.getTableName() + "...\n");
 
 			try {
 				Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
@@ -181,13 +182,17 @@ public class DatabaseReader {
 					}
 					rowCount++;
 					outputSQL.deleteCharAt(outputSQL.length()-1); //remove the last comma
-					outputSQL.append("),\n");
 
-					if (!dataRows.last() && rowCount % MAX_ALLOWED_ROWS == 0) {
-						outputSQL.deleteCharAt(outputSQL.length()-1); //remove the last comma
-						outputSQL.append(";\n");
-						outputSQL.append(table.getInsertSQL());
+					if (!dataRows.isLast()) {
+						outputSQL.append(",");
+
+						if (rowCount % MAX_ALLOWED_ROWS == 0) {
+							outputSQL.deleteCharAt(outputSQL.length()-1); //remove the last comma
+							outputSQL.append(";");
+							outputSQL.append(table.getInsertSQL());
+						}
 					}
+					outputSQL.append("\n");
 				}
 
 				outputSQL.deleteCharAt(outputSQL.length()-1); //remove the last comma
