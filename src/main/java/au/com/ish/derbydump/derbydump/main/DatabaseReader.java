@@ -244,9 +244,7 @@ public class DatabaseReader {
 		} catch (IOException e) {
 			LOGGER.error("Could not read data from stream :" +  e.getMessage() + "\n"+ sb.toString());
 		}
-		String result = sb.toString();
-		result = processStringData(result);
-		return result;
+		return processStringData(sb.toString());
 	}
 
 	/**
@@ -257,9 +255,7 @@ public class DatabaseReader {
 		if (data == null)
 			return "";
 
-		data = escapeQuotes(data.trim());
-		data = "'" + data + "'";
-		return data;
+		return "'" + escapeQuotes(data) + "'";
 	}
 
 	/**
@@ -270,16 +266,6 @@ public class DatabaseReader {
 	 * @return Escaped query
 	 */
 	public static String escapeQuotes(String raw) {
-		StringBuilder cooked = new StringBuilder();
-		char c;
-		for (int i = 0; i < raw.length(); i++) {
-			c = raw.charAt(i);
-			if (c == '\'') {
-				cooked = cooked.append('\'').append(c);
-			} else {
-				cooked = cooked.append(c);
-			}
-		}
-		return cooked.toString();
+		return raw.replaceAll("\'", "\'\'");
 	}
 }

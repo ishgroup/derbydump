@@ -127,16 +127,7 @@ public class DerbyDumpTest {
 		assertTrue("Wrong dump created: VALUES missing", data.toString().contains("1,'TestData','1970-01-01',,'漢字'"));
 		assertTrue("Wrong dump created: CLOB", data.toString().contains(BIG_CLOB));
 	}
-	
-	@Test
-	public void testEscapeQuotes(){
-	    String positive_test1 = "Test for escapaing the quotes (here's it goes)";
-	    String positive_test2 = "Test for escapaing the double quotes (here''s it goes)";
-	    
-	    assertEquals(positive_test1, "Test for escapaing the quotes (here''s it goes)", DatabaseReader.escapeQuotes(positive_test1));
-	    assertEquals(positive_test2, "Test for escapaing the double quotes (here''''s it goes)", DatabaseReader.escapeQuotes(positive_test2));
-   }
-	
+
 	@Test
 	public void testHexUtils(){
 		Hex hexEncoder = new Hex(CharEncoding.UTF_8);
