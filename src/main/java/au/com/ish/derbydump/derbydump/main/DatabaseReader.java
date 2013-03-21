@@ -183,12 +183,13 @@ public class DatabaseReader {
 					rowCount++;
 					outputSQL.deleteCharAt(outputSQL.length()-1); //remove the last comma
 
+					outputSQL.append(")");
 					if (!dataRows.isLast()) {
 						outputSQL.append(",");
 
 						if (rowCount % MAX_ALLOWED_ROWS == 0) {
 							outputSQL.deleteCharAt(outputSQL.length()-1); //remove the last comma
-							outputSQL.append(";");
+							outputSQL.append(";\n");
 							outputSQL.append(table.getInsertSQL());
 						}
 					}
