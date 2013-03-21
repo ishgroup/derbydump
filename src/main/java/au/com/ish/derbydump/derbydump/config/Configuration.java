@@ -27,12 +27,24 @@ public class Configuration {
 
 	private static Configuration configuration;
 	private Properties prop = new Properties();
+	private Properties tableRewriteProp = new Properties();
 
 	private Configuration() {
 		try {
 			FileInputStream file = new FileInputStream("derbydump.properties");
 			prop.load(file);
 			file.close();
+
+			if (getTableRewritePath() != null && getTableRewritePath().length() > 0) {
+				file = new FileInputStream(getTableRewritePath());
+				tableRewriteProp.load(file);
+				file.close();
+				for (String entry : tableRewriteProp.stringPropertyNames()) {
+					// put a copy of every entry into the properties as lowercase for case-insensitive matching later
+					tableRewriteProp.setProperty(entry.toLowerCase(), tableRewriteProp.getProperty(entry));
+				}
+			}
+
 		} catch (Exception ignored) {}
 
 	}
@@ -56,6 +68,13 @@ public class Configuration {
 		return stringBuilder.toString();
 	}
 
+	public String rewriteTableName(String tableName) {
+		String newName = tableRewriteProp.getProperty(tableName.toLowerCase());
+		if (newName != null) {
+			return newName;
+		}
+		return tableName;
+	}
 
 	public String getUserName() {
 		return prop.getProperty("db.userName");
@@ -114,5 +133,13 @@ public class Configuration {
 
 	public void setOutputFilePath(String outputFilePath) {
 		prop.setProperty("outputPath", outputFilePath);
+	}
+
+	public String getTableRewritePath() {
+		return prop.getProperty("tableRewritePath");
+	}
+
+	public void setTableRewritePath(String filePath) {
+		prop.setProperty("tableRewritePath", filePath);
 	}
 }

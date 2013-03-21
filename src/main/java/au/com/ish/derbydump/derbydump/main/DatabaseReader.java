@@ -91,7 +91,7 @@ public class DatabaseReader {
 			List<Column> columns = table.getColumns();
 
 			try {
-				Statement statement = connection.createStatement();
+				Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 				ResultSet dataRows = statement.executeQuery(table.getSelectQuery(schema));
 				int rowCount = 0;
 

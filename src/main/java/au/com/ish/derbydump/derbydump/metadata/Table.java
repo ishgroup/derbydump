@@ -16,6 +16,8 @@
 
 package au.com.ish.derbydump.derbydump.metadata;
 
+import au.com.ish.derbydump.derbydump.config.Configuration;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -34,7 +36,7 @@ public class Table {
 	 * Name of the table in the database.
 	 */
 	private String tableName;
-
+	private Configuration config = Configuration.getConfiguration();
 
 	/**
 	 * @param schema Database schema name
@@ -95,7 +97,7 @@ public class Table {
 	 * @return the tableName
 	 */
 	public String getTableName() {
-		return tableName;
+		return config.rewriteTableName(tableName);
 	}
 
 	/**
