@@ -203,9 +203,9 @@ public class DatabaseReader {
 			} catch (SQLException e) {
 				LOGGER.error("Error: " + e.getErrorCode() + " - " + e.getMessage());
 			}
+		}
 		output.add("SET FOREIGN_KEY_CHECKS = 1;");
 		LOGGER.debug("Reading done.");
-		}
 	}
 
 	/**
