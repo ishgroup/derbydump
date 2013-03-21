@@ -93,6 +93,10 @@ public class Table {
 		return columns;
 	}
 
+	public boolean isExcluded() {
+		return getTableName() == "**exclude**";
+	}
+
 	/**
 	 * @return the tableName
 	 */

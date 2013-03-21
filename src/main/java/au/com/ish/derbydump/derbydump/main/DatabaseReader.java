@@ -88,6 +88,9 @@ public class DatabaseReader {
 		output.add("SET FOREIGN_KEY_CHECKS = 0;\n");
 
 		for (Table table : tables) {
+			if (table.isExcluded()) {
+				break;
+			}
 			List<Column> columns = table.getColumns();
 			LOGGER.info("Table " + table.getTableName() + "...\n");
 
