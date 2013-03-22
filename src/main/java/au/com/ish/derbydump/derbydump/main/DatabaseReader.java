@@ -103,7 +103,7 @@ public class DatabaseReader {
 						StringBuilder outputSQL = new StringBuilder();
 
 						outputSQL.append("LOCK TABLES `" + table.getTableName() + "` WRITE;\n");
-						outputSQL.append(table.getInsertSQL());
+						outputSQL.append(table.getInsertSQL()).append("\n");
 
 						while (dataRows.next()) {
 
@@ -153,7 +153,7 @@ public class DatabaseReader {
 										break;
 									}
 									case Types.BIGINT: {
-										Long obj = dataRows.getLong(columnName);
+										Object obj = dataRows.getObject(columnName);
 										outputSQL.append(obj == null ? "NULL" : obj.toString());
 										break;
 									}

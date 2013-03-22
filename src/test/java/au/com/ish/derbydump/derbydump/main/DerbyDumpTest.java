@@ -28,6 +28,7 @@ import org.junit.Test;
 import java.io.*;
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.Types;
 
 import static junit.framework.Assert.*;
 
@@ -104,12 +105,14 @@ public class DerbyDumpTest {
 
 		// Create table to rename
 		sql = "CREATE TABLE " + Configuration.getConfiguration().getSchemaName() + ".TABLE3"
-				+ "(Id INTEGER)";
+				+ "(Id BIGINT)";
 		db.getConnection().createStatement().execute(sql);
 		db.getConnection().commit();
 		config.setTableRewriteProperty("TABLE3", "TABLE3New");
 		ps = db.getConnection().prepareStatement("INSERT INTO " + RESOURCE_SCHEMA_NAME + ".TABLE3" + " VALUES (?)");
-		ps.setInt(1, 1);
+		ps.setLong(1, 1);
+		ps.execute();
+		ps.setNull(1, Types.BIGINT);
 		ps.execute();
 		db.getConnection().commit();
 		ps.close();
@@ -158,6 +161,8 @@ public class DerbyDumpTest {
 		assertTrue("Wrong dump created: table was not properly renamed", data.toString().contains("LOCK TABLES `TABLE3New` WRITE"));
 
 		assertFalse("Wrong dump created: table has no data", data.toString().contains("LOCK TABLES `TABLE4` WRITE"));
+
+		assertFalse("Wrong dump created: null BIGINT not properly handled", data.toString().contains("(0)"));
 	}
 
 	@Test
