@@ -57,22 +57,14 @@ public class DerbyDumpTest {
 
 		db = new DBConnectionManager(config.getDerbyUrl().replace("create=false", "create=true"));
 
-		String sql = "CREATE TABLE " + Configuration.getConfiguration().getSchemaName() + ".DumperTest"
+		String sql = "CREATE TABLE " + RESOURCE_SCHEMA_NAME + ".DumperTest"
 				+ "(Id INTEGER NOT NULL,Des VARCHAR(25),Time DATE,nullTime TIMESTAMP, Type VARCHAR(25),Location INTEGER,Alert INTEGER, clobData CLOB(32000))";
 
 		db.getConnection().createStatement().execute(sql);
 		db.getConnection().commit();
 
-		sql = "CREATE TABLE " + Configuration.getConfiguration().getSchemaName() + ".TABLE2"
-				+ "(Id INTEGER)";
-		db.getConnection().createStatement().execute(sql);
-		db.getConnection().commit();
 
-		config.setTableRewriteProperty("TABLE2", "--exclude--");
-
-		PreparedStatement ps = db.getConnection().prepareStatement("INSERT INTO "
-				+ config.getSchemaName() + "." + TABLE_NAME
-				+ " VALUES (?,?,?,?,?,?,?,?)");
+		PreparedStatement ps = db.getConnection().prepareStatement("INSERT INTO " + RESOURCE_SCHEMA_NAME + ".DumperTest" + " VALUES (?,?,?,?,?,?,?,?)");
 		ps.setInt(1, 1);
 		ps.setString(2, "TestData");
 		ps.setDate(3, new Date(2000));
@@ -95,6 +87,39 @@ public class DerbyDumpTest {
 		ps.execute();
 		db.getConnection().commit();
 		ps.close();
+
+
+		// Create table to exclude
+		sql = "CREATE TABLE " + Configuration.getConfiguration().getSchemaName() + ".TABLE2"
+				+ "(Id INTEGER)";
+		db.getConnection().createStatement().execute(sql);
+		db.getConnection().commit();
+		config.setTableRewriteProperty("TABLE2", "--exclude--");
+		ps = db.getConnection().prepareStatement("INSERT INTO " + RESOURCE_SCHEMA_NAME + ".TABLE2" + " VALUES (?)");
+		ps.setInt(1, 1);
+		ps.execute();
+		db.getConnection().commit();
+		ps.close();
+
+
+		// Create table to rename
+		sql = "CREATE TABLE " + Configuration.getConfiguration().getSchemaName() + ".TABLE3"
+				+ "(Id INTEGER)";
+		db.getConnection().createStatement().execute(sql);
+		db.getConnection().commit();
+		config.setTableRewriteProperty("TABLE3", "TABLE3New");
+		ps = db.getConnection().prepareStatement("INSERT INTO " + RESOURCE_SCHEMA_NAME + ".TABLE3" + " VALUES (?)");
+		ps.setInt(1, 1);
+		ps.execute();
+		db.getConnection().commit();
+		ps.close();
+
+
+		// Create table with no data
+		sql = "CREATE TABLE " + Configuration.getConfiguration().getSchemaName() + ".TABLE4"
+				+ "(Id INTEGER)";
+		db.getConnection().createStatement().execute(sql);
+		db.getConnection().commit();
 	}
 
 	@Test
@@ -127,6 +152,12 @@ public class DerbyDumpTest {
 		assertTrue("Wrong dump created: INSERT missing", data.toString().contains("INSERT INTO DUMPERTEST (ID,DES,TIME,NULLTIME,TYPE,LOCATION,ALERT,CLOBDATA) VALUES"));
 		assertTrue("Wrong dump created: VALUES missing", data.toString().contains("1,'TestData','1970-01-01',NULL,'漢字'"));
 		assertTrue("Wrong dump created: CLOB", data.toString().contains(BIG_CLOB));
+
+		assertFalse("Wrong dump created: table should have been excluded", data.toString().contains("LOCK TABLES `TABLE2` WRITE"));
+		assertFalse("Wrong dump created: table was not properly renamed", data.toString().contains("LOCK TABLES `TABLE3` WRITE"));
+		assertTrue("Wrong dump created: table was not properly renamed", data.toString().contains("LOCK TABLES `TABLE3New` WRITE"));
+
+		assertFalse("Wrong dump created: table has no data", data.toString().contains("LOCK TABLES `TABLE4` WRITE"));
 	}
 
 	@Test
