@@ -68,6 +68,12 @@ public class Configuration {
 		return stringBuilder.toString();
 	}
 
+
+	public void setTableRewriteProperty(String key, String value) {
+		tableRewriteProp.setProperty(key.toLowerCase(), value);
+	}
+
+
 	public String rewriteTableName(String tableName) {
 		String newName = tableRewriteProp.getProperty(tableName.toLowerCase());
 		if (newName != null) {

@@ -94,7 +94,7 @@ public class Table {
 	}
 
 	public boolean isExcluded() {
-		return getTableName() == "**exclude**";
+		return getTableName().equals("--exclude--");
 	}
 
 	/**

@@ -28,7 +28,6 @@ import org.junit.Test;
 import java.io.*;
 import java.sql.Date;
 import java.sql.PreparedStatement;
-import java.sql.Statement;
 
 import static junit.framework.Assert.*;
 
@@ -58,17 +57,19 @@ public class DerbyDumpTest {
 
 		db = new DBConnectionManager(config.getDerbyUrl().replace("create=false", "create=true"));
 
-		String sql = "CREATE TABLE "
-				+ Configuration.getConfiguration().getSchemaName()
-				+ "."
-				+ TABLE_NAME
+		String sql = "CREATE TABLE " + Configuration.getConfiguration().getSchemaName() + ".DumperTest"
 				+ "(Id INTEGER NOT NULL,Des VARCHAR(25),Time DATE,nullTime TIMESTAMP, Type VARCHAR(25),Location INTEGER,Alert INTEGER, clobData CLOB(32000))";
 
-		Statement statement = db.getConnection().createStatement();
-		statement.execute(sql);
+		db.getConnection().createStatement().execute(sql);
 		db.getConnection().commit();
-		statement.close();
-		Thread.sleep(2000);
+
+		sql = "CREATE TABLE " + Configuration.getConfiguration().getSchemaName() + ".TABLE2"
+				+ "(Id INTEGER)";
+		db.getConnection().createStatement().execute(sql);
+		db.getConnection().commit();
+
+		config.setTableRewriteProperty("TABLE2", "--exclude--");
+
 		PreparedStatement ps = db.getConnection().prepareStatement("INSERT INTO "
 				+ config.getSchemaName() + "." + TABLE_NAME
 				+ " VALUES (?,?,?,?,?,?,?,?)");

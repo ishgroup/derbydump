@@ -88,131 +88,130 @@ public class DatabaseReader {
 		output.add("SET FOREIGN_KEY_CHECKS = 0;\n");
 
 		for (Table table : tables) {
-			if (table.isExcluded()) {
-				break;
-			}
-			List<Column> columns = table.getColumns();
-			LOGGER.info("Table " + table.getTableName() + "...\n");
+			if (!table.isExcluded()) {
+				List<Column> columns = table.getColumns();
+				LOGGER.info("Table " + table.getTableName() + "...\n");
 
-			try {
-				Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-				ResultSet dataRows = statement.executeQuery(table.getSelectQuery(schema));
-				int rowCount = 0;
+				try {
+					Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+					ResultSet dataRows = statement.executeQuery(table.getSelectQuery(schema));
+					int rowCount = 0;
 
-				StringBuilder outputSQL = new StringBuilder();
+					StringBuilder outputSQL = new StringBuilder();
 
-				outputSQL.append("LOCK TABLES `" + table.getTableName() + "` WRITE;\n");
-				outputSQL.append(table.getInsertSQL());
+					outputSQL.append("LOCK TABLES `" + table.getTableName() + "` WRITE;\n");
+					outputSQL.append(table.getInsertSQL());
 
-				while (dataRows.next()) {
+					while (dataRows.next()) {
 
-					outputSQL.append("(");
-					for (Column column : columns) {
+						outputSQL.append("(");
+						for (Column column : columns) {
 
-						String columnName = column.getColumnName();
-						int columnType = column.getColumnDataType();
-						switch (columnType) {
-							case Types.BINARY:
-							case Types.VARBINARY:
-							case Types.BLOB: {
-								byte[] obj = dataRows.getBytes(columnName);
-								outputSQL.append(obj == null ? "NULL" : processBinaryData(obj));
-								break;
+							String columnName = column.getColumnName();
+							int columnType = column.getColumnDataType();
+							switch (columnType) {
+								case Types.BINARY:
+								case Types.VARBINARY:
+								case Types.BLOB: {
+									byte[] obj = dataRows.getBytes(columnName);
+									outputSQL.append(obj == null ? "NULL" : processBinaryData(obj));
+									break;
+								}
+								case Types.CLOB: {
+									Clob obj = dataRows.getClob(columnName);
+									outputSQL.append(obj == null ? "NULL" : processClobData(obj));
+									break;
+								}
+								case Types.CHAR:
+								case Types.LONGNVARCHAR:
+								case Types.VARCHAR: {
+									String obj = dataRows.getString(columnName);
+									outputSQL.append(obj == null ? "NULL" : processStringData(obj));
+									break;
+								}
+								case Types.TIME: {
+									Time obj = dataRows.getTime(columnName);
+									outputSQL.append(obj == null ? "NULL" : processStringData(obj.toString()));
+									break;
+								}
+								case Types.DATE: {
+									Date obj = dataRows.getDate(columnName);
+									outputSQL.append(obj == null ? "NULL" : processStringData(obj.toString()));
+									break;
+								}
+								case Types.TIMESTAMP: {
+									Timestamp obj = dataRows.getTimestamp(columnName);
+									outputSQL.append(obj == null ? "NULL" : processStringData(obj.toString()));
+									break;
+								}
+								case Types.SMALLINT: {
+									Object obj = dataRows.getObject(columnName);
+									outputSQL.append(obj == null ? "NULL" : obj.toString());
+									break;
+								}
+								case Types.BIGINT: {
+									Long obj = dataRows.getLong(columnName);
+									outputSQL.append(obj == null ? "NULL" : obj.toString());
+									break;
+								}
+								case Types.INTEGER: {
+									Object obj = dataRows.getObject(columnName);
+									outputSQL.append(obj == null ? "NULL" : obj.toString());
+									break;
+								}
+								case Types.NUMERIC:
+								case Types.DECIMAL: {
+									BigDecimal obj = dataRows.getBigDecimal(columnName);
+									outputSQL.append(obj == null ? "NULL" : String.valueOf(obj));
+									break;
+								}
+								case Types.REAL:
+								case Types.FLOAT: {
+									Float obj = dataRows.getFloat(columnName);
+									outputSQL.append(obj == null ? "NULL" : String.valueOf(obj));
+									break;
+								}
+								case Types.DOUBLE: {
+									Double obj = dataRows.getDouble(columnName);
+									outputSQL.append(obj == null ? "NULL" : String.valueOf(obj));
+									break;
+								}
+								default: {
+									Object obj = dataRows.getObject(columnName);
+									outputSQL.append(obj == null ? "NULL" : obj.toString());
+								}
 							}
-							case Types.CLOB: {
-								Clob obj = dataRows.getClob(columnName);
-								outputSQL.append(obj == null ? "NULL" : processClobData(obj));
-								break;
-							}
-							case Types.CHAR:
-							case Types.LONGNVARCHAR:
-							case Types.VARCHAR: {
-								String obj = dataRows.getString(columnName);
-								outputSQL.append(obj == null ? "NULL" : processStringData(obj));
-								break;
-							}
-							case Types.TIME: {
-								Time obj = dataRows.getTime(columnName);
-								outputSQL.append(obj == null ? "NULL" : processStringData(obj.toString()));
-								break;
-							}
-							case Types.DATE: {
-								Date obj = dataRows.getDate(columnName);
-								outputSQL.append(obj == null ? "NULL" : processStringData(obj.toString()));
-								break;
-							}
-							case Types.TIMESTAMP: {
-								Timestamp obj = dataRows.getTimestamp(columnName);
-								outputSQL.append(obj == null ? "NULL" : processStringData(obj.toString()));
-								break;
-							}
-							case Types.SMALLINT: {
-								Object obj = dataRows.getObject(columnName);
-								outputSQL.append(obj == null ? "NULL" : obj.toString());
-								break;
-							}
-							case Types.BIGINT: {
-								Long obj = dataRows.getLong(columnName);
-								outputSQL.append(obj == null ? "NULL" : obj.toString());
-								break;
-							}
-							case Types.INTEGER: {
-								Object obj = dataRows.getObject(columnName);
-								outputSQL.append(obj == null ? "NULL" : obj.toString());
-								break;
-							}
-							case Types.NUMERIC:
-							case Types.DECIMAL: {
-								BigDecimal obj = dataRows.getBigDecimal(columnName);
-								outputSQL.append(obj == null ? "NULL" : String.valueOf(obj));
-								break;
-							}
-							case Types.REAL:
-							case Types.FLOAT: {
-								Float obj = dataRows.getFloat(columnName);
-								outputSQL.append(obj == null ? "NULL" : String.valueOf(obj));
-								break;
-							}
-							case Types.DOUBLE: {
-								Double obj = dataRows.getDouble(columnName);
-								outputSQL.append(obj == null ? "NULL" : String.valueOf(obj));
-								break;
-							}
-							default: {
-								Object obj = dataRows.getObject(columnName);
-								outputSQL.append(obj == null ? "NULL" : obj.toString());
+							outputSQL.append(",");
+						}
+						rowCount++;
+						outputSQL.deleteCharAt(outputSQL.length()-1); //remove the last comma
+
+						outputSQL.append(")");
+						if (!dataRows.isLast()) {
+							outputSQL.append(",");
+
+							if (rowCount % MAX_ALLOWED_ROWS == 0) {
+								outputSQL.deleteCharAt(outputSQL.length()-1); //remove the last comma
+								outputSQL.append(";\n");
+								outputSQL.append(table.getInsertSQL());
 							}
 						}
-						outputSQL.append(",");
+						outputSQL.append("\n");
 					}
-					rowCount++;
+
 					outputSQL.deleteCharAt(outputSQL.length()-1); //remove the last comma
+					outputSQL.append(";\n");
 
-					outputSQL.append(")");
-					if (!dataRows.isLast()) {
-						outputSQL.append(",");
+					outputSQL.append("UNLOCK TABLES;\n");
 
-						if (rowCount % MAX_ALLOWED_ROWS == 0) {
-							outputSQL.deleteCharAt(outputSQL.length()-1); //remove the last comma
-							outputSQL.append(";\n");
-							outputSQL.append(table.getInsertSQL());
-						}
-					}
-					outputSQL.append("\n");
+					output.add(outputSQL.toString());
+
+					dataRows.close();
+					statement.close();
+
+				} catch (SQLException e) {
+					LOGGER.error("Error: " + e.getErrorCode() + " - " + e.getMessage());
 				}
-
-				outputSQL.deleteCharAt(outputSQL.length()-1); //remove the last comma
-				outputSQL.append(";\n");
-
-				outputSQL.append("UNLOCK TABLES;\n");
-
-				output.add(outputSQL.toString());
-
-				dataRows.close();
-				statement.close();
-
-			} catch (SQLException e) {
-				LOGGER.error("Error: " + e.getErrorCode() + " - " + e.getMessage());
 			}
 		}
 		output.add("SET FOREIGN_KEY_CHECKS = 1;");
