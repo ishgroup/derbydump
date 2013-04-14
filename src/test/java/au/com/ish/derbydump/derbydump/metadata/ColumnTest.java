@@ -20,10 +20,21 @@ public class ColumnTest {
 
 	@Test
 	public void testEscapeQuotes(){
-		String test1 = "Test for escaping the quotes (here's it goes)";
-		String test2 = "Test for escaping the double quotes (here''s it goes)";
+		String test1 = "'Single quotes'";
+		assertEquals("Single quote", "\\'Single quotes\\'", Column.escapeQuotes(test1));
+		
+		String test2 = "''Single quotes twice''";
+		assertEquals("Single quotes twice", "\\'\\'Single quotes twice\\'\\'", Column.escapeQuotes(test2));
+		
+		String test3 = "Tab\t";
+		assertEquals("Tab", "Tab\\t", Column.escapeQuotes(test3));
 
-		assertEquals("Single quote", "Test for escaping the quotes (here''s it goes)", Column.escapeQuotes(test1));
-		assertEquals("Double quote", "Test for escaping the double quotes (here''''s it goes)", Column.escapeQuotes(test2));
+		String test4 = "Single backslash\\";
+		assertEquals("Backslash", "Single backslash\\\\", Column.escapeQuotes(test4));
+
+		String test5 = "Newline\n and carriage return\r";
+		assertEquals("Newline", "Newline\\n and carriage return\\r", Column.escapeQuotes(test5));
+
+		
 	}
 }

@@ -240,6 +240,32 @@ public class Column {
 	 * @return Escaped query
 	 */
 	public static String escapeQuotes(String raw) {
-		return raw.replaceAll("\'", "\'\'");
+		String output;
+		
+		// Replace "\" with "\\"
+		output = raw.replaceAll("\\\\", "\\\\\\\\");
+		
+		// Replace ASCII NUL
+		output = output.replaceAll("\\x00", "\\\\0");
+
+		// Replace tab with "\t"
+		output = output.replaceAll("\\x09", "\\\\t");
+
+		// Replace backspace with "\b"
+		output = output.replaceAll("\\x08", "\\\\b");
+
+		// Replace newline with "\n"
+		output = output.replaceAll("\\n", "\\\\n");
+
+		// Replace carriage return with "\r"
+		output = output.replaceAll("\\r", "\\\\r");
+
+		// Replace ASCII 26 (Windows eof)
+		output = output.replaceAll("\\x1a", "\\\\Z");
+		
+		// Replace "'" with "\'"
+		output = output.replaceAll("\'", "\\\\'");
+		
+		return output;
 	}
 }
