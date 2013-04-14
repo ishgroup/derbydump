@@ -17,19 +17,16 @@
 package au.com.ish.derbydump.derbydump.main;
 
 import au.com.ish.derbydump.derbydump.config.Configuration;
+import au.com.ish.derbydump.derbydump.config.DBConnectionManager;
 import au.com.ish.derbydump.derbydump.metadata.Column;
 import au.com.ish.derbydump.derbydump.metadata.Database;
 import au.com.ish.derbydump.derbydump.metadata.Table;
-import au.com.ish.derbydump.derbydump.config.DBConnectionManager;
-import org.apache.commons.codec.CharEncoding;
-import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 /**
@@ -108,95 +105,22 @@ public class DatabaseReader {
 						while (dataRows.next()) {
 
 							outputSQL.append("(");
+							
 							for (Column column : columns) {
-
-								String columnName = column.getColumnName();
-								int columnType = column.getColumnDataType();
-								switch (columnType) {
-									case Types.BINARY:
-									case Types.VARBINARY:
-									case Types.BLOB: {
-										byte[] obj = dataRows.getBytes(columnName);
-										outputSQL.append(obj == null ? "NULL" : processBinaryData(obj));
-										break;
-									}
-									case Types.CLOB: {
-										Clob obj = dataRows.getClob(columnName);
-										outputSQL.append(obj == null ? "NULL" : processClobData(obj));
-										break;
-									}
-									case Types.CHAR:
-									case Types.LONGNVARCHAR:
-									case Types.VARCHAR: {
-										String obj = dataRows.getString(columnName);
-										outputSQL.append(obj == null ? "NULL" : processStringData(obj));
-										break;
-									}
-									case Types.TIME: {
-										Time obj = dataRows.getTime(columnName);
-										outputSQL.append(obj == null ? "NULL" : processStringData(obj.toString()));
-										break;
-									}
-									case Types.DATE: {
-										Date obj = dataRows.getDate(columnName);
-										outputSQL.append(obj == null ? "NULL" : processStringData(obj.toString()));
-										break;
-									}
-									case Types.TIMESTAMP: {
-										Timestamp obj = dataRows.getTimestamp(columnName);
-										outputSQL.append(obj == null ? "NULL" : processStringData(obj.toString()));
-										break;
-									}
-									case Types.SMALLINT: {
-										Object obj = dataRows.getObject(columnName);
-										outputSQL.append(obj == null ? "NULL" : obj.toString());
-										break;
-									}
-									case Types.BIGINT: {
-										Object obj = dataRows.getObject(columnName);
-										outputSQL.append(obj == null ? "NULL" : obj.toString());
-										break;
-									}
-									case Types.INTEGER: {
-										Object obj = dataRows.getObject(columnName);
-										outputSQL.append(obj == null ? "NULL" : obj.toString());
-										break;
-									}
-									case Types.NUMERIC:
-									case Types.DECIMAL: {
-										BigDecimal obj = dataRows.getBigDecimal(columnName);
-										outputSQL.append(obj == null ? "NULL" : String.valueOf(obj));
-										break;
-									}
-									case Types.REAL:
-									case Types.FLOAT: {
-										Float obj = dataRows.getFloat(columnName);
-										outputSQL.append(obj == null ? "NULL" : String.valueOf(obj));
-										break;
-									}
-									case Types.DOUBLE: {
-										Double obj = dataRows.getDouble(columnName);
-										outputSQL.append(obj == null ? "NULL" : String.valueOf(obj));
-										break;
-									}
-									default: {
-										Object obj = dataRows.getObject(columnName);
-										outputSQL.append(obj == null ? "NULL" : obj.toString());
-									}
-								}
+								outputSQL.append(column.toString(dataRows));
 								outputSQL.append(",");
 							}
 							rowCount++;
 							outputSQL.deleteCharAt(outputSQL.length()-1); //remove the last comma
 
 							outputSQL.append(")");
+							
 							if (!dataRows.isLast()) {
-								outputSQL.append(",");
-
 								if (rowCount % MAX_ALLOWED_ROWS == 0) {
-									outputSQL.deleteCharAt(outputSQL.length()-1); //remove the last comma
 									outputSQL.append(";\n");
-									outputSQL.append(table.getInsertSQL());
+									outputSQL.append(table.getInsertSQL()).append("\n");
+								} else {
+									outputSQL.append(",");									
 								}
 							}
 							outputSQL.append("\n");
@@ -221,66 +145,5 @@ public class DatabaseReader {
 		}
 		output.add("SET FOREIGN_KEY_CHECKS = 1;");
 		LOGGER.debug("Reading done.");
-	}
-
-	/**
-	 * @param binaryData
-	 * @return String representation of binary data
-	 */
-	String processBinaryData(byte[] binaryData) {
-		if (binaryData == null) {
-			return "";
-		}
-
-		Hex hexEncoder = new Hex(CharEncoding.UTF_8);
-		return  "'" + new String(hexEncoder.encode(binaryData)) + "'";
-	}
-
-	/**
-	 * @param data
-	 * @return String representation of Clob.
-	 */
-	String processClobData(Clob data) {
-		if (data == null)
-			return "";
-
-		StringBuilder sb = new StringBuilder();
-		try {
-			Reader reader = data.getCharacterStream();
-			BufferedReader br = new BufferedReader(reader);
-
-			String line;
-			while (null != (line = br.readLine())) {
-				sb.append(line);
-			}
-			br.close();
-		} catch (SQLException e) {
-			LOGGER.error("Could not read data from stream :" + e.getErrorCode() + " - " + e.getMessage() + "\n"+ sb.toString());
-		} catch (IOException e) {
-			LOGGER.error("Could not read data from stream :" +  e.getMessage() + "\n"+ sb.toString());
-		}
-		return processStringData(sb.toString());
-	}
-
-	/**
-	 * @param data
-	 * @return String representation of string data after escaping.
-	 */
-	private String processStringData(String data) {
-		if (data == null)
-			return "";
-
-		return "'" + escapeQuotes(data) + "'";
-	}
-
-	/**
-	 * Escapes sql special characters
-	 *
-	 * @param raw
-	 *
-	 * @return Escaped query
-	 */
-	public static String escapeQuotes(String raw) {
-		return raw.replaceAll("\'", "\'\'");
 	}
 }
