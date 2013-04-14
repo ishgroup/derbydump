@@ -16,8 +16,7 @@
 
 package au.com.ish.derbydump.derbydump.metadata;
 
-import org.apache.commons.codec.CharEncoding;
-import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
@@ -191,8 +190,7 @@ public class Column {
 			return "NULL";
 		}
 
-		Hex hexEncoder = new Hex(CharEncoding.UTF_8);
-		return  "'" + new String(hexEncoder.encode(binaryData)) + "'";
+		return "'" + Base64.encodeBase64String(binaryData) + "'";
 	}
 
 	/**
@@ -216,7 +214,7 @@ public class Column {
 		} catch (SQLException e) {
 			LOGGER.error("Could not read data from stream :" + e.getErrorCode() + " - " + e.getMessage() + "\n"+ sb.toString());
 		} catch (IOException e) {
-			LOGGER.error("Could not read data from stream :" +  e.getMessage() + "\n"+ sb.toString());
+			LOGGER.error("Could not read data from stream :" + e.getMessage() + "\n" + sb.toString());
 		}
 		return processStringData(sb.toString());
 	}
