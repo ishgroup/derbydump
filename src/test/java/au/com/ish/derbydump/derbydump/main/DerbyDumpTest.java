@@ -65,7 +65,7 @@ public class DerbyDumpTest {
 		db.getConnection().commit();
 
 
-		PreparedStatement ps = db.getConnection().prepareStatement("INSERT INTO " + RESOURCE_SCHEMA_NAME + ".DumperTest" + " VALUES (?,?,?,?,?,?,?,?)");
+		PreparedStatement ps = db.getConnection().prepareStatement("INSERT INTO " + RESOURCE_SCHEMA_NAME + ".DumperTest VALUES (?,?,?,?,?,?,?,?)");
 		ps.setInt(1, 1);
 		ps.setString(2, "TestData");
 		ps.setDate(3, new Date(2000));
@@ -91,12 +91,11 @@ public class DerbyDumpTest {
 
 
 		// Create table to exclude
-		sql = "CREATE TABLE " + Configuration.getConfiguration().getSchemaName() + ".TABLE2"
-				+ "(Id INTEGER)";
+		sql = "CREATE TABLE " + Configuration.getConfiguration().getSchemaName() + ".TABLE2 (Id INTEGER)";
 		db.getConnection().createStatement().execute(sql);
 		db.getConnection().commit();
 		config.setTableRewriteProperty("TABLE2", "--exclude--");
-		ps = db.getConnection().prepareStatement("INSERT INTO " + RESOURCE_SCHEMA_NAME + ".TABLE2" + " VALUES (?)");
+		ps = db.getConnection().prepareStatement("INSERT INTO " + RESOURCE_SCHEMA_NAME + ".TABLE2 VALUES (?)");
 		ps.setInt(1, 1);
 		ps.execute();
 		db.getConnection().commit();
@@ -104,12 +103,11 @@ public class DerbyDumpTest {
 
 
 		// Create table to rename
-		sql = "CREATE TABLE " + Configuration.getConfiguration().getSchemaName() + ".TABLE3"
-				+ "(Id BIGINT)";
+		sql = "CREATE TABLE " + Configuration.getConfiguration().getSchemaName() + ".TABLE3 (Id BIGINT)";
 		db.getConnection().createStatement().execute(sql);
 		db.getConnection().commit();
 		config.setTableRewriteProperty("TABLE3", "TABLE3New");
-		ps = db.getConnection().prepareStatement("INSERT INTO " + RESOURCE_SCHEMA_NAME + ".TABLE3" + " VALUES (?)");
+		ps = db.getConnection().prepareStatement("INSERT INTO " + RESOURCE_SCHEMA_NAME + ".TABLE3 VALUES (?)");
 		ps.setLong(1, 1);
 		ps.execute();
 		ps.setNull(1, Types.BIGINT);
@@ -119,10 +117,21 @@ public class DerbyDumpTest {
 
 
 		// Create table with no data
-		sql = "CREATE TABLE " + Configuration.getConfiguration().getSchemaName() + ".TABLE4"
-				+ "(Id INTEGER)";
+		sql = "CREATE TABLE " + Configuration.getConfiguration().getSchemaName() + ".TABLE4 (Id INTEGER)";
 		db.getConnection().createStatement().execute(sql);
 		db.getConnection().commit();
+
+		
+		// Create table with blob
+		sql = "CREATE TABLE " + RESOURCE_SCHEMA_NAME + ".TABLE5 (data BLOB)";
+		db.getConnection().createStatement().execute(sql);
+		db.getConnection().commit();
+		InputStream penguins = DerbyDumpTest.class.getResourceAsStream("Penguins.jpg");
+		ps = db.getConnection().prepareStatement("INSERT INTO " + RESOURCE_SCHEMA_NAME + ".TABLE5 VALUES (?)");
+		ps.setBinaryStream(1, penguins);
+		ps.execute();
+		db.getConnection().commit();
+		ps.close();
 	}
 
 	@Test

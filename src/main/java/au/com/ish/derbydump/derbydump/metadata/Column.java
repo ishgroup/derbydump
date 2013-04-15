@@ -16,8 +16,7 @@
 
 package au.com.ish.derbydump.derbydump.metadata;
 
-import org.apache.commons.codec.CharEncoding;
-import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
@@ -191,8 +190,7 @@ public class Column {
 			return "NULL";
 		}
 
-		Hex hexEncoder = new Hex(CharEncoding.UTF_8);
-		return  "'" + new String(hexEncoder.encode(binaryData)) + "'";
+		return "'" + Base64.encodeBase64String(binaryData) + "'";
 	}
 
 	/**
@@ -216,7 +214,7 @@ public class Column {
 		} catch (SQLException e) {
 			LOGGER.error("Could not read data from stream :" + e.getErrorCode() + " - " + e.getMessage() + "\n"+ sb.toString());
 		} catch (IOException e) {
-			LOGGER.error("Could not read data from stream :" +  e.getMessage() + "\n"+ sb.toString());
+			LOGGER.error("Could not read data from stream :" + e.getMessage() + "\n" + sb.toString());
 		}
 		return processStringData(sb.toString());
 	}
@@ -240,6 +238,32 @@ public class Column {
 	 * @return Escaped query
 	 */
 	public static String escapeQuotes(String raw) {
-		return raw.replaceAll("\'", "\'\'");
+		String output;
+		
+		// Replace "\" with "\\"
+		output = raw.replaceAll("\\\\", "\\\\\\\\");
+		
+		// Replace ASCII NUL
+		output = output.replaceAll("\\x00", "\\\\0");
+
+		// Replace tab with "\t"
+		output = output.replaceAll("\\x09", "\\\\t");
+
+		// Replace backspace with "\b"
+		output = output.replaceAll("\\x08", "\\\\b");
+
+		// Replace newline with "\n"
+		output = output.replaceAll("\\n", "\\\\n");
+
+		// Replace carriage return with "\r"
+		output = output.replaceAll("\\r", "\\\\r");
+
+		// Replace ASCII 26 (Windows eof)
+		output = output.replaceAll("\\x1a", "\\\\Z");
+		
+		// Replace "'" with "\'"
+		output = output.replaceAll("\'", "\\\\'");
+		
+		return output;
 	}
 }
