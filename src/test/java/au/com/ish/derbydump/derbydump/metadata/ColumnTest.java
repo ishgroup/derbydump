@@ -1,20 +1,52 @@
 package au.com.ish.derbydump.derbydump.metadata;
 
+import java.io.InputStream;
+import java.sql.Clob;
+
+import javax.sql.rowset.serial.SerialClob;
+
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 
 
 public class ColumnTest {
 
 	@Test
 	public void testProcessBinaryData() throws Exception {
+		InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("Penguins.jpg");
+		byte[] inputData = IOUtils.toByteArray(is);
+
+		assertEquals(5569, inputData.length);
+
+		String result = Column.processBinaryData(inputData);
+
+		assertEquals(7430, result.length());
 
 	}
 
 	@Test
-	public void testProcessClobData() throws Exception {
+	public void testProcessNullBinaryData() throws Exception {
+		assertEquals("NULL", Column.processBinaryData(null));
+		assertEquals("''", Column.processBinaryData(new byte[]{}));
+	}
 
+	@Test
+	public void testProcessClobData() throws Exception {
+		String oneSimpleClob = "one simple clob";
+		Clob inputClob = new SerialClob(oneSimpleClob.toCharArray());
+
+		String processedString = Column.processClobData(inputClob);
+
+		assertEquals("'"+oneSimpleClob+"'", processedString);
+	}
+
+	@Test
+	public void testProcessNullClobData() throws Exception {
+		assertEquals("NULL", Column.processClobData(null));
+		assertEquals("''", Column.processClobData(new SerialClob("".toCharArray())));
 	}
 
 
