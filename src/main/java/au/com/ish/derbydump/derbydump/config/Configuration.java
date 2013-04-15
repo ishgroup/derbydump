@@ -1,4 +1,20 @@
-package com.db.exporter.config;
+/*
+ * Copyright 2013 ish group pty ltd
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package au.com.ish.derbydump.derbydump.config;
 
 import java.io.FileInputStream;
 import java.util.Properties;
@@ -11,12 +27,24 @@ public class Configuration {
 
 	private static Configuration configuration;
 	private Properties prop = new Properties();
+	private Properties tableRewriteProp = new Properties();
 
 	private Configuration() {
 		try {
 			FileInputStream file = new FileInputStream("derbydump.properties");
 			prop.load(file);
 			file.close();
+
+			if (getTableRewritePath() != null && getTableRewritePath().length() > 0) {
+				file = new FileInputStream(getTableRewritePath());
+				tableRewriteProp.load(file);
+				file.close();
+				for (String entry : tableRewriteProp.stringPropertyNames()) {
+					// put a copy of every entry into the properties as lowercase for case-insensitive matching later
+					tableRewriteProp.setProperty(entry.toLowerCase(), tableRewriteProp.getProperty(entry));
+				}
+			}
+
 		} catch (Exception ignored) {}
 
 	}
@@ -33,13 +61,26 @@ public class Configuration {
 		stringBuilder.append("jdbc:derby:");
 		stringBuilder.append(getDerbyDbPath());
 		stringBuilder.append(";create=true;");
-		stringBuilder.append("user=" + getUserName() + ";");
-		stringBuilder.append("password=" + getPassword() + ";");
+		stringBuilder.append("user=").append(getUserName()).append(";");
+		stringBuilder.append("password=").append(getPassword()).append(";");
 		stringBuilder.append("create=false;");
 
 		return stringBuilder.toString();
 	}
 
+
+	public void setTableRewriteProperty(String key, String value) {
+		tableRewriteProp.setProperty(key.toLowerCase(), value);
+	}
+
+
+	public String rewriteTableName(String tableName) {
+		String newName = tableRewriteProp.getProperty(tableName.toLowerCase());
+		if (newName != null) {
+			return newName;
+		}
+		return tableName;
+	}
 
 	public String getUserName() {
 		return prop.getProperty("db.userName");
@@ -98,5 +139,13 @@ public class Configuration {
 
 	public void setOutputFilePath(String outputFilePath) {
 		prop.setProperty("outputPath", outputFilePath);
+	}
+
+	public String getTableRewritePath() {
+		return prop.getProperty("tableRewritePath");
+	}
+
+	public void setTableRewritePath(String filePath) {
+		prop.setProperty("tableRewritePath", filePath);
 	}
 }

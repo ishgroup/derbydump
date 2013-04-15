@@ -28,3 +28,16 @@ dump.buffer.size = 8912
 ## Output options ##
 # Path to where you want the output file written
 outputPath = derbyDumpOutput.sql
+
+
+# Path to a file which contains a list of table names to rewrite in the output
+# The file should have one table per line as:
+# OriginaltableName = NewTableName
+#
+# This can be very useful to fix the case of table names, such as when exporting to
+# mysql. Since the left hand side is matches case insensitively, you can write
+# Contact = Contact
+# in order to output the Derby table CONTACT as "Contact"
+#
+# If the right side is "**exclude**" then this table is not included in the output
+tableRewritePath = tableRewrite.txt

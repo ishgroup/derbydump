@@ -1,4 +1,20 @@
-package com.db.exporter.metadata;
+/*
+ * Copyright 2013 ish group pty ltd
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package au.com.ish.derbydump.derbydump.metadata;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -84,20 +100,20 @@ public class MetaDataColumnDescriptor
      */
     public Object readColumn(ResultSet resultSet) throws SQLException
     {
-        Object result = null;
+        Object result;
 
         try
         {
             switch (_jdbcType)
             {
                 case Types.BIT:
-                    result = new Boolean(resultSet.getBoolean(_columnName));
+                    result = resultSet.getBoolean(_columnName);
                     break;
                 case Types.INTEGER:
-                    result = new Integer(resultSet.getInt(_columnName));
+                    result = resultSet.getInt(_columnName);
                     break;
                 case Types.TINYINT:
-                    result = new Short(resultSet.getShort(_columnName));
+                    result = resultSet.getShort(_columnName);
                     break;
                 default:
                     result = resultSet.getString(_columnName);

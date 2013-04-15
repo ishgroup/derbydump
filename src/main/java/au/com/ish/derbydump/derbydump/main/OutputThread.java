@@ -1,6 +1,22 @@
-package com.db.exporter.main;
+/*
+ * Copyright 2013 ish group pty ltd
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import com.db.exporter.config.Configuration;
+package au.com.ish.derbydump.derbydump.main;
+
+import au.com.ish.derbydump.derbydump.config.Configuration;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -14,13 +30,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class OutputThread implements Runnable {
 	private static final Logger LOGGER = Logger.getLogger(OutputThread.class);
 
-	private Configuration config;
 	private Writer out;
 	private final BlockingQueue<String> queue = new LinkedBlockingQueue<String>(1024);
 	private boolean stopping = false;
 
 	public OutputThread() {
-		config = Configuration.getConfiguration();
+		Configuration config = Configuration.getConfiguration();
 
 		try {
 			File file = new File(config.getOutputFilePath());
