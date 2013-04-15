@@ -54,6 +54,8 @@ public class DumpTest {
 	private Configuration config;
 
 	private String tableName;
+	private String outputTableName;
+	private boolean skipped;
 	private String[] columns;
 	private Object[] valuesToInsert;
 	private String[] validOutputs;
@@ -70,11 +72,17 @@ public class DumpTest {
 		db = new DBConnectionManager(config.getDerbyUrl().replace("create=false", "create=true"));
 	}
 
-	public DumpTest(String tableName, String[] columns, Object[] valuesToInsert, String[] validOutputs) {
-		this.tableName = tableName.toUpperCase();
+	public DumpTest(String tableName, String outputTableName, String[] columns, Object[] valuesToInsert, String[] validOutputs, boolean skipped) {
+		this.tableName = tableName;
+		if (outputTableName == null) {
+			this.outputTableName = tableName.toUpperCase();
+		} else {
+			this.outputTableName = outputTableName;
+		}
 		this.columns = columns;
 		this.valuesToInsert = valuesToInsert;
 		this.validOutputs = validOutputs;
+		this.skipped = skipped;
 	}
 
 	@Parameterized.Parameters(name = "{0}")
@@ -99,7 +107,7 @@ public class DumpTest {
 			Object[] values = new Object[] {row1, row2, row3, row4, row5};
 			String[] validOutput = new String[] {validOutput1, validOutput2, validOutput3, validOutput4, validOutput5};
 
-			result.add(new Object[] {"testNumbers", columns, values, validOutput});
+			result.add(new Object[] {"testNumbers", null, columns, values, validOutput, false});
 		}
 
 		//testing strings
@@ -121,7 +129,7 @@ public class DumpTest {
 			Object[] values = new Object[] {row1, row2, row3, row4};
 			String[] validOutput = new String[] {validOutput1, validOutput2, validOutput3, validOutput4};
 
-			result.add(new Object[] {"testStrings", columns, values, validOutput});
+			result.add(new Object[] {"testStrings", null, columns, values, validOutput, false});
 		}
 
 		//testing dates
@@ -147,13 +155,12 @@ public class DumpTest {
 			Object[] values = new Object[] {row1, row2};
 			String[] validOutput = new String[] {validOutput1, validOutput2};
 
-			result.add(new Object[] {"testDates", columns, values, validOutput});
+			result.add(new Object[] {"testDates", null, columns, values, validOutput, false});
 		}
 
 		//testing CLOB
 		{
 			String[] columns = new String[] {"c1 CLOB"};
-			// test standard dates
 			Object[] row1 = new Object[] {"<clob value here>"};
 			String validOutput1 = "('<clob value here>'),";
 			Object[] row2 = new Object[] {null};
@@ -161,13 +168,12 @@ public class DumpTest {
 			Object[] values = new Object[] {row1, row2};
 			String[] validOutput = new String[] {validOutput1, validOutput2};
 
-			result.add(new Object[] {"testClob", columns, values, validOutput});
+			result.add(new Object[] {"testClob", null, columns, values, validOutput, false});
 		}
 
 		//testing BLOB
 		{
 			String[] columns = new String[] {"c1 BLOB"};
-			// test standard dates
 			Object[] row1 = new Object[] {getTestImage()};
 			String validOutput1 = "("+ IOUtils.toString(getTestImage())+"),";
 			Object[] row2 = new Object[] {null};
@@ -175,7 +181,42 @@ public class DumpTest {
 			Object[] values = new Object[] {row1, row2};
 			String[] validOutput = new String[] {validOutput1, validOutput2};
 
-			result.add(new Object[] {"testBlob", columns, values, validOutput});
+			result.add(new Object[] {"testBlob", null, columns, values, validOutput, false});
+		}
+
+		//testing skipping table
+		{
+			String[] columns = new String[] {"c1 VARCHAR(5)"};
+			Object[] row1 = new Object[] {"123"};
+			String validOutput1 = "";
+			Object[] row2 = new Object[] {null};
+			String validOutput2 = "(NULL);";
+			Object[] values = new Object[] {row1, row2};
+			String[] validOutput = new String[] {validOutput1, validOutput2};
+
+			result.add(new Object[] {"testSkip", null, columns, values, validOutput, true});
+		}
+
+		//testing renaming table
+		{
+			String[] columns = new String[] {"c1 VARCHAR(5)"};
+			Object[] row1 = new Object[] {"123"};
+			String validOutput1 = "('123'),";
+			Object[] row2 = new Object[] {null};
+			String validOutput2 = "(NULL);";
+			Object[] values = new Object[] {row1, row2};
+			String[] validOutput = new String[] {validOutput1, validOutput2};
+
+			result.add(new Object[] {"testRename", "testRenameNew", columns, values, validOutput, false});
+		}
+
+		//testing empty table
+		{
+			String[] columns = new String[] {"c1 VARCHAR(5)"};
+			Object[] values = new Object[] {new Object[] {}};
+			String[] validOutput = new String[] {};
+
+			result.add(new Object[] {"testEmptyTable", null, columns, values, validOutput, true});
 		}
 
 
@@ -218,6 +259,10 @@ public class DumpTest {
 		insertBuffer.append(")");
 
 
+		config.setTableRewriteProperty("testSkip", "--exclude--");
+		config.setTableRewriteProperty("testRename", "testRenameNew");
+
+
 		Connection connection = db.createNewConnection();
 		Statement statement = connection.createStatement();
 		PreparedStatement ps = null;
@@ -229,16 +274,18 @@ public class DumpTest {
 
 			for (Object o:valuesToInsert) {
 				Object[] vals = (Object[]) o;
-				ps = db.getConnection().prepareStatement(insertBuffer.toString());
-				for (int i=0;i<vals.length;i++) {
-					if (vals[i] instanceof InputStream) {
-						ps.setBinaryStream(i + 1, (InputStream) vals[i]);
-					} else {
-						ps.setObject(i+1, vals[i]);
+				if (vals.length > 0) {
+					ps = db.getConnection().prepareStatement(insertBuffer.toString());
+					for (int i=0;i<vals.length;i++) {
+						if (vals[i] instanceof InputStream) {
+							ps.setBinaryStream(i + 1, (InputStream) vals[i]);
+						} else {
+							ps.setObject(i+1, vals[i]);
+						}
 					}
+					ps.execute();
+					connection.commit();
 				}
-				ps.execute();
-				connection.commit();
 			}
 
 			File f = new File(RESOURCE_DUMP_LOCATION);
@@ -258,22 +305,21 @@ public class DumpTest {
 			// Now let's read the output and see what is in it
 			List<String> lines = FileUtils.readLines(f);
 
-			System.out.println("output for debug:");
-			for (String line : lines) {
-				System.out.println(line);
-			}
-
 			assertEquals("Missing foreign key operations", "SET FOREIGN_KEY_CHECKS = 0;", lines.get(0));
 			assertEquals("Missing foreign key operations", "SET FOREIGN_KEY_CHECKS = 1;", lines.get(lines.size()-1));
 
-			assertTrue("LOCK missing", lines.contains("LOCK TABLES `" + tableName + "` WRITE;"));
-			assertTrue("UNLOCK missing",lines.contains("UNLOCK TABLES;"));
+			if (!skipped) {
+				assertTrue("LOCK missing", lines.contains("LOCK TABLES `" + outputTableName + "` WRITE;"));
+				assertTrue("UNLOCK missing",lines.contains("UNLOCK TABLES;"));
 
-			int index =  lines.indexOf("LOCK TABLES `" + tableName + "` WRITE;");
-			assertTrue("INSERT missing", lines.get(index+1).startsWith("INSERT INTO "+tableName));
-			for (String s : validOutputs) {
-				assertTrue("VALUES missing :"+s, lines.contains(s));
-			};
+				int index =  lines.indexOf("LOCK TABLES `" + outputTableName + "` WRITE;");
+				assertTrue("INSERT missing", lines.get(index+1).startsWith("INSERT INTO "+outputTableName));
+				for (String s : validOutputs) {
+					assertTrue("VALUES missing :"+s, lines.contains(s));
+				};
+			} else {
+				assertTrue("LOCK missing", !lines.contains("LOCK TABLES `" + outputTableName + "` WRITE;"));
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("failed to create test data" + e.getMessage());
