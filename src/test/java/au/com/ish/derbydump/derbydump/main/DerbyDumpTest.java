@@ -37,7 +37,7 @@ public class DerbyDumpTest {
 	private static final Logger LOGGER = Logger.getLogger(DerbyDumpTest.class);
 
 	private static final String TABLE_NAME = "DumperTest";
-	private static final String RESOURCE_DATABASE_PATH = "memory:testdb";
+	private static final String RESOURCE_DATABASE_PATH = "memory:testdbOld";
 	private static final String RESOURCE_DRIVER_NAME = "org.apache.derby.jdbc.EmbeddedDriver";
 	private static final String RESOURCE_SCHEMA_NAME = "app";
 	private static final String RESOURCE_DUMP_LOCATION = "./target/test.sql";
