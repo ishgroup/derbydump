@@ -32,8 +32,7 @@ import java.math.BigInteger;
 import java.sql.*;
 import java.util.*;
 
-import static junit.framework.Assert.*;
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.TestCase.*;
 
 /**
  * comprehensive test for the whole process
@@ -221,7 +220,6 @@ public class DumpTest {
 			result.add(new Object[] {"testEmptyTable", null, columns, values, validOutput, true});
 		}
 
-
 		return result;
 	}
 
@@ -232,14 +230,14 @@ public class DumpTest {
 	@Test
 	public void theTest() throws SQLException {
 		// Create table
-		StringBuffer createTableBuffer = new StringBuffer();
+		StringBuilder createTableBuffer = new StringBuilder();
 		createTableBuffer.append("CREATE TABLE ");
 		createTableBuffer.append(Configuration.getConfiguration().getSchemaName());
 		createTableBuffer.append(".");
 		createTableBuffer.append(tableName);
 		createTableBuffer.append(" (");
 
-		StringBuffer insertBuffer = new StringBuffer();
+		StringBuilder insertBuffer = new StringBuilder();
 		insertBuffer.append("INSERT INTO ");
 		insertBuffer.append(RESOURCE_SCHEMA_NAME);
 		insertBuffer.append(".");
@@ -318,7 +316,7 @@ public class DumpTest {
 				assertTrue("INSERT missing", lines.get(index+1).startsWith("INSERT INTO "+outputTableName));
 				for (String s : validOutputs) {
 					assertTrue("VALUES missing :"+s, lines.contains(s));
-				};
+				}
 			} else {
 				assertTrue("LOCK missing", !lines.contains("LOCK TABLES `" + outputTableName + "` WRITE;"));
 			}
