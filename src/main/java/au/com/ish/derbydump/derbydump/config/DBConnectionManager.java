@@ -23,15 +23,21 @@ import java.sql.SQLException;
 
 public class DBConnectionManager {
 
-	private Connection connection;
+	private Connection innitialConnection;
+	private String url;
 
 	public DBConnectionManager(String url) throws ClassNotFoundException, IllegalAccessException, InstantiationException, SQLException {
 		Class.forName(Configuration.getConfiguration().getDriverClassName()).newInstance();
-		connection = DriverManager.getConnection(url);
+		this.url = url;
+		innitialConnection = createNewConnection();
 	}
 
-	public  Connection getConnection() {
-		return connection;
+	public Connection getConnection() {
+		return innitialConnection;
+	}
+
+	public Connection createNewConnection() throws SQLException {
+		return DriverManager.getConnection(url);
 	}
 
 }
