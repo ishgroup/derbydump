@@ -136,7 +136,7 @@ public class DumpTest {
 		{
 			String[] columns = new String[] {"c1 TIMESTAMP", "c2 TIMESTAMP"};
 			// test standard dates
-			Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+			Calendar c = Calendar.getInstance(TimeZone.getDefault());
 			c.set(Calendar.YEAR, 2013);
 			c.set(Calendar.MONTH, 5);
 			c.set(Calendar.DAY_OF_MONTH, 6);
@@ -149,7 +149,7 @@ public class DumpTest {
 			c2.add(Calendar.DATE, -5000);
 
 			Object[] row1 = new Object[] {c.getTime(), c2.getTime()};
-			String validOutput1 = "('2013-06-06 21:10:10.011','1999-09-28 21:10:10.011'),";
+			String validOutput1 = "('2013-06-06 11:10:10.011','1999-09-28 11:10:10.011'),";
 			Object[] row2 = new Object[] {null, null};
 			String validOutput2 = "(NULL,NULL);";
 			Object[] values = new Object[] {row1, row2};
