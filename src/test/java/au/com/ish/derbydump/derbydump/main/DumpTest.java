@@ -32,8 +32,7 @@ import java.math.BigInteger;
 import java.sql.*;
 import java.util.*;
 
-import static junit.framework.Assert.*;
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.TestCase.*;
 
 /**
  * comprehensive test for the whole process
@@ -136,7 +135,7 @@ public class DumpTest {
 		{
 			String[] columns = new String[] {"c1 TIMESTAMP", "c2 TIMESTAMP"};
 			// test standard dates
-			Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+			Calendar c = Calendar.getInstance(TimeZone.getDefault());
 			c.set(Calendar.YEAR, 2013);
 			c.set(Calendar.MONTH, 5);
 			c.set(Calendar.DAY_OF_MONTH, 6);
@@ -149,11 +148,13 @@ public class DumpTest {
 			c2.add(Calendar.DATE, -5000);
 
 			Object[] row1 = new Object[] {c.getTime(), c2.getTime()};
-			String validOutput1 = "('2013-06-06 21:10:10.011','1999-09-28 21:10:10.011'),";
-			Object[] row2 = new Object[] {null, null};
-			String validOutput2 = "(NULL,NULL);";
-			Object[] values = new Object[] {row1, row2};
-			String[] validOutput = new String[] {validOutput1, validOutput2};
+			String validOutput1 = "('2013-06-06 11:10:10.011','1999-09-28 11:10:10.011'),";
+			Object[] row2 = new Object[] {"2012-07-07 08:54:33","1999-09-09 10:04:10"};
+			String validOutput2 = "('2012-07-07 08:54:33.0','1999-09-09 10:04:10.0'),";
+			Object[] row3 = new Object[] {null, null};
+			String validOutput3 = "(NULL,NULL);";
+			Object[] values = new Object[] {row1, row2, row3};
+			String[] validOutput = new String[] {validOutput1, validOutput2, validOutput3};
 
 			result.add(new Object[] {"testDates", null, columns, values, validOutput, false});
 		}
@@ -219,7 +220,6 @@ public class DumpTest {
 			result.add(new Object[] {"testEmptyTable", null, columns, values, validOutput, true});
 		}
 
-
 		return result;
 	}
 
@@ -230,14 +230,14 @@ public class DumpTest {
 	@Test
 	public void theTest() throws SQLException {
 		// Create table
-		StringBuffer createTableBuffer = new StringBuffer();
+		StringBuilder createTableBuffer = new StringBuilder();
 		createTableBuffer.append("CREATE TABLE ");
 		createTableBuffer.append(Configuration.getConfiguration().getSchemaName());
 		createTableBuffer.append(".");
 		createTableBuffer.append(tableName);
 		createTableBuffer.append(" (");
 
-		StringBuffer insertBuffer = new StringBuffer();
+		StringBuilder insertBuffer = new StringBuilder();
 		insertBuffer.append("INSERT INTO ");
 		insertBuffer.append(RESOURCE_SCHEMA_NAME);
 		insertBuffer.append(".");
@@ -316,7 +316,7 @@ public class DumpTest {
 				assertTrue("INSERT missing", lines.get(index+1).startsWith("INSERT INTO "+outputTableName));
 				for (String s : validOutputs) {
 					assertTrue("VALUES missing :"+s, lines.contains(s));
-				};
+				}
 			} else {
 				assertTrue("LOCK missing", !lines.contains("LOCK TABLES `" + outputTableName + "` WRITE;"));
 			}
