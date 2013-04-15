@@ -17,6 +17,7 @@
 package au.com.ish.derbydump.derbydump.metadata;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.sql.*;
+import java.util.List;
 
 /**
  * Represents a column in a database table.
@@ -201,22 +203,22 @@ public class Column {
 		if (data == null)
 			return "NULL";
 
-		StringBuilder sb = new StringBuilder();
+		Reader reader = null;
+		BufferedReader br = null;
 		try {
-			Reader reader = data.getCharacterStream();
-			BufferedReader br = new BufferedReader(reader);
+			reader = data.getCharacterStream();
+			br = new BufferedReader(reader);
 
-			String line;
-			while (null != (line = br.readLine())) {
-				sb.append(line);
-			}
-			br.close();
+			return processStringData(IOUtils.toString(br));
 		} catch (SQLException e) {
-			LOGGER.error("Could not read data from stream :" + e.getErrorCode() + " - " + e.getMessage() + "\n"+ sb.toString());
+			LOGGER.error("Could not read data from stream :" + e.getErrorCode() + " - " + e.getMessage(), e);
 		} catch (IOException e) {
-			LOGGER.error("Could not read data from stream :" + e.getMessage() + "\n" + sb.toString());
+			LOGGER.error("Could not read data from stream :" + e.getMessage(), e);
+		} finally {
+			IOUtils.closeQuietly(reader);
+			IOUtils.closeQuietly(br);
 		}
-		return processStringData(sb.toString());
+		return "NULL";
 	}
 
 	/**
