@@ -150,10 +150,12 @@ public class DumpTest {
 
 			Object[] row1 = new Object[] {c.getTime(), c2.getTime()};
 			String validOutput1 = "('2013-06-06 11:10:10.011','1999-09-28 11:10:10.011'),";
-			Object[] row2 = new Object[] {null, null};
-			String validOutput2 = "(NULL,NULL);";
-			Object[] values = new Object[] {row1, row2};
-			String[] validOutput = new String[] {validOutput1, validOutput2};
+			Object[] row2 = new Object[] {"2012-07-07 08:54:33","1999-09-09 10:04:10"};
+			String validOutput2 = "('2012-07-07 08:54:33.0','1999-09-09 10:04:10.0'),";
+			Object[] row3 = new Object[] {null, null};
+			String validOutput3 = "(NULL,NULL);";
+			Object[] values = new Object[] {row1, row2, row3};
+			String[] validOutput = new String[] {validOutput1, validOutput2, validOutput3};
 
 			result.add(new Object[] {"testDates", null, columns, values, validOutput, false});
 		}
