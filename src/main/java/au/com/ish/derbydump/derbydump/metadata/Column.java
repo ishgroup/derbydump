@@ -185,7 +185,7 @@ public class Column {
 	 * @param binaryData
 	 * @return String representation of binary data
 	 */
-	String processBinaryData(byte[] binaryData) {
+	public static String processBinaryData(byte[] binaryData) {
 		if (binaryData == null) {
 			return "NULL";
 		}
@@ -197,7 +197,7 @@ public class Column {
 	 * @param data
 	 * @return String representation of Clob.
 	 */
-	String processClobData(Clob data) {
+	public static String processClobData(Clob data) {
 		if (data == null)
 			return "NULL";
 
@@ -223,7 +223,7 @@ public class Column {
 	 * @param data
 	 * @return String representation of string data after escaping.
 	 */
-	private String processStringData(String data) {
+	private static String processStringData(String data) {
 		if (data == null)
 			return "NULL";
 
