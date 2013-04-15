@@ -18,6 +18,7 @@ package au.com.ish.derbydump.derbydump.main;
 
 import au.com.ish.derbydump.derbydump.config.Configuration;
 import au.com.ish.derbydump.derbydump.config.DBConnectionManager;
+import au.com.ish.derbydump.derbydump.metadata.Column;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -29,7 +30,6 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.*;
-import java.sql.Date;
 import java.util.*;
 
 import static junit.framework.Assert.*;
@@ -175,7 +175,7 @@ public class DumpTest {
 		{
 			String[] columns = new String[] {"c1 BLOB"};
 			Object[] row1 = new Object[] {getTestImage()};
-			String validOutput1 = "("+ IOUtils.toString(getTestImage())+"),";
+			String validOutput1 = "("+ Column.processBinaryData(IOUtils.toByteArray(getTestImage()))+"),";
 			Object[] row2 = new Object[] {null};
 			String validOutput2 = "(NULL);";
 			Object[] values = new Object[] {row1, row2};

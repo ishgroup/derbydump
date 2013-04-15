@@ -9,7 +9,6 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
 
 
 public class ColumnTest {
