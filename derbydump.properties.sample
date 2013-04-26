@@ -39,5 +39,5 @@ outputPath = derbyDumpOutput.sql
 # Contact = Contact
 # in order to output the Derby table CONTACT as "Contact"
 #
-# If the right side is "**exclude**" then this table is not included in the output
+# If the right side is "--exclude--" then this table is not included in the output
 tableRewritePath = tableRewrite.txt
