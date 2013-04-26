@@ -1,3 +1,5 @@
+.gradle
+
 *.class
 
 # Package Files #
@@ -6,6 +8,7 @@
 *.ear
 
 /target
+/build
 /logs
 derby.log
 

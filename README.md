@@ -19,8 +19,8 @@ Derby SQL dump. This project will take a Derby database and export the data in i
 3. # cd derbydump
 4. # cp derbydump.properties.sample derbydump.properties
 5. Edit derbydump.properties for your needs
-6. # mvn package
-7. # java -jar target/derbydump-1.0-SNAPSHOT-jar-with-dependencies.jar
+6. # ./gradlew jar
+7. # java -jar build/lib/derbydump-1.0-SNAPSHOT.jar
 
 
 ## Continuous integration testing

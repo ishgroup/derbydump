@@ -1,0 +1,23 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+group = 'au.com.ish'
+version = '1.0-SNAPSHOT'
+
+description = "derbydump"
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+repositories {
+  mavenRepo url: "http://repo.maven.apache.org/maven2"
+}
+
+dependencies {
+  compile 'log4j:log4j:1.2.16'
+  compile 'commons-codec:commons-codec:1.7'
+  compile 'commons-io:commons-io:2.4'
+  compile 'org.apache.derby:derby:10.9.1.0'
+
+  testCompile 'junit:junit:4.11'
+}
