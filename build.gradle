@@ -21,3 +21,5 @@ dependencies {
 
   testCompile 'junit:junit:4.11'
 }
+
+[ compileJava, compileTestJava ]*.options*.encoding = 'UTF-8'

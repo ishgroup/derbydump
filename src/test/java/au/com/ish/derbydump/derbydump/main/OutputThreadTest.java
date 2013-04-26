@@ -30,7 +30,7 @@ public class OutputThreadTest {
 
 	private static final Logger LOGGER = Logger.getLogger(OutputThreadTest.class);
 
-	private static final String RESOURCE_DUMP_LOCATION = "./target/writer_test.out";
+	private static final String RESOURCE_DUMP_LOCATION = "./build/tmp/writer_test.out";
 
 	@BeforeClass
 	public static void setUp() throws Exception {

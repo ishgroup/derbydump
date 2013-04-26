@@ -45,7 +45,7 @@ public class DumpTest {
 	private static final String RESOURCE_DATABASE_PATH = "memory:testdb";
 	private static final String RESOURCE_DRIVER_NAME = "org.apache.derby.jdbc.EmbeddedDriver";
 	private static final String RESOURCE_SCHEMA_NAME = "app";
-	private static final String RESOURCE_DUMP_LOCATION = "./target/test.sql";
+	private static final String RESOURCE_DUMP_LOCATION = "./build/tmp/test.sql";
 	private static final int RESOURCE_MAX_BUFFER_SIZE = 200;
 
 	private DBConnectionManager db;
@@ -61,6 +61,9 @@ public class DumpTest {
 
 	@Before
 	public void setUp() throws Exception {
+		File f = new File(RESOURCE_DUMP_LOCATION);
+		f.mkdirs();
+		
 		config = Configuration.getConfiguration();
 		config.setDerbyDbPath(RESOURCE_DATABASE_PATH);
 		config.setDriverClassName(RESOURCE_DRIVER_NAME);
