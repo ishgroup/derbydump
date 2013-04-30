@@ -148,4 +148,15 @@ public class Configuration {
 	public void setTableRewritePath(String filePath) {
 		prop.setProperty("tableRewritePath", filePath);
 	}
+
+	public void setTruncateTables(boolean truncate) {
+		prop.setProperty("output.truncateTables", String.valueOf(truncate));
+	}
+
+	public boolean getTruncateTables() {
+		if (prop.getProperty("output.truncateTables") == null) {
+			return false;
+		}
+		return  Boolean.valueOf(prop.getProperty("output.truncateTables").trim());
+	}
 }

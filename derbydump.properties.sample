@@ -21,13 +21,15 @@ db.password = secret!
 
 
 ## Internal options ##
-# buffer size in kB. Must be larger than the largest row.
-dump.buffer.size = 8912 
+# buffer size in kB. Must be larger than the largest row. defaults to 8912
+dump.buffer.size = 8912
 
 
 ## Output options ##
 # Path to where you want the output file written
 outputPath = derbyDumpOutput.sql
+# Whether to add truncate table statements before inserting data, defaults to false
+output.truncateTables = true
 
 
 # Path to a file which contains a list of table names to rewrite in the output
