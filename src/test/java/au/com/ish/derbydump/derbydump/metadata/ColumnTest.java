@@ -3,6 +3,7 @@ package au.com.ish.derbydump.derbydump.metadata;
 import java.io.InputStream;
 import java.sql.Clob;
 
+import javax.sql.rowset.serial.SerialBlob;
 import javax.sql.rowset.serial.SerialClob;
 
 import org.apache.commons.io.IOUtils;
@@ -20,16 +21,18 @@ public class ColumnTest {
 
 		assertEquals(5569, inputData.length);
 
-		String result = Column.processBinaryData(inputData);
+		String result = Column.processBinaryData(new SerialBlob(inputData));
 
-		assertEquals(7430, result.length());
+		assertEquals(11140, result.length());
 
+		assertEquals("0x61", Column.processBinaryData(new SerialBlob(new byte[]{'a'})));
+		assertEquals("0x0A", Column.processBinaryData(new SerialBlob(new byte[]{'\n'})));
 	}
 
 	@Test
 	public void testProcessNullBinaryData() throws Exception {
 		assertEquals("NULL", Column.processBinaryData(null));
-		assertEquals("''", Column.processBinaryData(new byte[]{}));
+		assertEquals("NULL", Column.processBinaryData(new SerialBlob(new byte[]{})));
 	}
 
 	@Test

@@ -32,6 +32,8 @@ import java.math.BigInteger;
 import java.sql.*;
 import java.util.*;
 
+import javax.sql.rowset.serial.SerialBlob;
+
 import static junit.framework.TestCase.*;
 
 /**
@@ -42,11 +44,11 @@ public class DumpTest {
 
 	private static final Logger LOGGER = Logger.getLogger(DumpTest.class);
 
-	private static final String RESOURCE_DATABASE_PATH = "memory:testdb";
-	private static final String RESOURCE_DRIVER_NAME = "org.apache.derby.jdbc.EmbeddedDriver";
-	private static final String RESOURCE_SCHEMA_NAME = "app";
+	public static final String RESOURCE_DATABASE_PATH = "memory:testdb";
+	public static final String RESOURCE_DRIVER_NAME = "org.apache.derby.jdbc.EmbeddedDriver";
+	public static final String RESOURCE_SCHEMA_NAME = "app";
 	private static final String RESOURCE_DUMP_LOCATION = "./build/tmp/test.sql";
-	private static final int RESOURCE_MAX_BUFFER_SIZE = 200;
+	public static final int RESOURCE_MAX_BUFFER_SIZE = 200;
 
 	private DBConnectionManager db;
 
@@ -181,7 +183,8 @@ public class DumpTest {
 		{
 			String[] columns = new String[] {"c1 BLOB"};
 			Object[] row1 = new Object[] {getTestImage()};
-			String validOutput1 = "("+ Column.processBinaryData(IOUtils.toByteArray(getTestImage()))+"),";
+			Blob serialBlob = new SerialBlob(IOUtils.toByteArray(getTestImage()));
+			String validOutput1 = "("+ Column.processBinaryData(serialBlob)+"),";
 			Object[] row2 = new Object[] {null};
 			String validOutput2 = "(NULL);";
 			Object[] values = new Object[] {row1, row2};
