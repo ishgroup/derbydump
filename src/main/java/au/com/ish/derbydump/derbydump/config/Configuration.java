@@ -60,10 +60,9 @@ public class Configuration {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("jdbc:derby:");
 		stringBuilder.append(getDerbyDbPath());
-		stringBuilder.append(";create=true;");
+		stringBuilder.append(";create=false;");
 		stringBuilder.append("user=").append(getUserName()).append(";");
 		stringBuilder.append("password=").append(getPassword()).append(";");
-		stringBuilder.append("create=false;");
 
 		return stringBuilder.toString();
 	}
