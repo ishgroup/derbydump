@@ -16,7 +16,7 @@
 
 package au.com.ish.derbydump.derbydump.metadata;
 
-import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.sql.*;
-import java.util.List;
 
 /**
  * Represents a column in a database table.
@@ -112,7 +111,7 @@ public class Column {
 			case Types.BINARY:
 			case Types.VARBINARY:
 			case Types.BLOB: {
-				byte[] obj = dataRow.getBytes(columnName);
+				Blob obj = dataRow.getBlob(columnName);
 				return (obj == null) ? "NULL" : processBinaryData(obj);
 			}
 			
@@ -184,15 +183,32 @@ public class Column {
 
 
 	/**
-	 * @param binaryData
+	 * this is a tricky one. according to
+	 <ul>
+	 <li>http://db.apache.org/derby/docs/10.2/ref/rrefjdbc96386.html</li>
+	 <li>http://stackoverflow.com/questions/7510112/how-to-make-java-ignore-escape-sequences-in-a-string</li>
+	 <li>http://dba.stackexchange.com/questions/10642/mysql-mysqldump-uses-n-instead-of-null</li>
+	 <li>http://stackoverflow.com/questions/12038814/import-hex-binary-data-into-mysql</li>
+	 <li>http://stackoverflow.com/questions/3126210/insert-hex-values-into-mysql</li>
+	 <li>http://www.xaprb.com/blog/2009/02/12/5-ways-to-make-hexadecimal-identifiers-perform-better-on-mysql/</li>
+	 </ul>
+	 and many others, there is no safer way of exporting blobs than separate data files or hex format.<br/>
+	 tested, mysql detects and imports hex encoded fields automatically.
+
+	 * @param blob
 	 * @return String representation of binary data
 	 */
-	public static String processBinaryData(byte[] binaryData) {
-		if (binaryData == null) {
+	public static String processBinaryData(Blob blob) throws SQLException {
+		if (blob == null) {
 			return "NULL";
 		}
+		int blobLength =  (int) blob.length();
+		if (blobLength == 0) {
+			return "NULL";
+		}
+		byte[] bytes = blob.getBytes(1L, blobLength);
 
-		return "'" + Base64.encodeBase64String(binaryData) + "'";
+		return "0x"+new String(Hex.encodeHex(bytes)).toUpperCase();
 	}
 
 	/**
