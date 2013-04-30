@@ -19,7 +19,7 @@ public class BlobDumpTest {
 
 
 	private Configuration config;
-	private File actualDump = new File("./build/tmp/actualDump.sql");
+	private File actualDump = new File("./build/outputs/actualDump.sql");
 	private File expectedDump = new File("./src/test/resources/expectedDump.sql");
 
 	@Before

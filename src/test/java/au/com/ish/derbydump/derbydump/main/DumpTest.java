@@ -47,7 +47,6 @@ public class DumpTest {
 	public static final String RESOURCE_DATABASE_PATH = "memory:testdb";
 	public static final String RESOURCE_DRIVER_NAME = "org.apache.derby.jdbc.EmbeddedDriver";
 	public static final String RESOURCE_SCHEMA_NAME = "app";
-	private static final String RESOURCE_DUMP_LOCATION = "./build/tmp/test.sql";
 	public static final int RESOURCE_MAX_BUFFER_SIZE = 200;
 
 	private DBConnectionManager db;
@@ -64,15 +63,11 @@ public class DumpTest {
 
 	@Before
 	public void setUp() throws Exception {
-		File f = new File(RESOURCE_DUMP_LOCATION);
-		f.mkdirs();
-		
 		config = Configuration.getConfiguration();
 		config.setDerbyDbPath(RESOURCE_DATABASE_PATH);
 		config.setDriverClassName(RESOURCE_DRIVER_NAME);
 		config.setSchemaName(RESOURCE_SCHEMA_NAME);
 		config.setBufferMaxSize(RESOURCE_MAX_BUFFER_SIZE);
-		config.setOutputFilePath(new File(RESOURCE_DUMP_LOCATION).getCanonicalPath());
 
 		db = new DBConnectionManager(config.getDerbyUrl().replace("create=false", "create=true"));
 	}
@@ -254,7 +249,7 @@ public class DumpTest {
 	}
 
 	@Test
-	public void theDumpTest() throws SQLException {
+	public void theDumpTest() throws Exception {
 		// Create table
 		StringBuilder createTableBuffer = new StringBuilder();
 		createTableBuffer.append("CREATE TABLE ");
@@ -289,6 +284,13 @@ public class DumpTest {
 		config.setTableRewriteProperty("testRename", "testRenameNew");
 		config.setTruncateTables(truncate);
 
+		File f = new File("./build/outputs/"+tableName+".sql");
+		if (f.exists()) {
+			f.delete();
+		}
+		f.mkdirs();
+
+		config.setOutputFilePath(f.getCanonicalPath());
 
 		Connection connection = db.createNewConnection();
 		Statement statement = connection.createStatement();
@@ -313,11 +315,6 @@ public class DumpTest {
 					ps.execute();
 					connection.commit();
 				}
-			}
-
-			File f = new File(RESOURCE_DUMP_LOCATION);
-			if (f.exists()) {
-				f.delete();
 			}
 
 			OutputThread output = new OutputThread();
