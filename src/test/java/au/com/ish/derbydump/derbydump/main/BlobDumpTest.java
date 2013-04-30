@@ -1,15 +1,14 @@
 package au.com.ish.derbydump.derbydump.main;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.List;
 
 import au.com.ish.derbydump.derbydump.config.Configuration;
 import au.com.ish.derbydump.derbydump.config.DBConnectionManager;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -39,7 +38,15 @@ public class BlobDumpTest {
 		config.setTruncateTables(false);
 
 		System.out.println("db "+config.getDerbyUrl().replace("create=false", "create=true"));
+	}
 
+	@After
+	public void tearDown() throws Exception {
+		try {
+			new DBConnectionManager("jdbc:derby:"+config.getDerbyDbPath()+";drop=true");
+		} catch (SQLNonTransientConnectionException e) {
+			//the db was dropped
+		}
 	}
 
 	@Test

@@ -35,7 +35,12 @@ public class OutputThreadTest {
 	@BeforeClass
 	public static void setUp() throws Exception {
 		Configuration config = Configuration.getConfiguration();
-		config.setOutputFilePath(new File(RESOURCE_DUMP_LOCATION).getCanonicalPath());
+		File output = new File(RESOURCE_DUMP_LOCATION);
+		if (output.exists()) {
+			output.delete();
+		}
+		output.mkdirs();
+		config.setOutputFilePath(output.getCanonicalPath());
 
 	}
 

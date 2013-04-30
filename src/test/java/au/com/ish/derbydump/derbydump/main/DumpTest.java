@@ -77,6 +77,15 @@ public class DumpTest {
 		db = new DBConnectionManager(config.getDerbyUrl().replace("create=false", "create=true"));
 	}
 
+	@After
+	public void tearDown() throws Exception {
+		try {
+			new DBConnectionManager("jdbc:derby:"+config.getDerbyDbPath()+";drop=true");
+		} catch (SQLNonTransientConnectionException e) {
+			//the db was dropped
+		}
+	}
+
 	public DumpTest(String tableName, String outputTableName, String[] columns, Object[] valuesToInsert, String[] validOutputs, boolean skipped, boolean truncate) {
 		this.tableName = tableName;
 		if (outputTableName == null) {
