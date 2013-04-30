@@ -242,7 +242,7 @@ public class DumpTest {
 	}
 
 	@Test
-	public void theTest() throws SQLException {
+	public void theDumpTest() throws SQLException {
 		// Create table
 		StringBuilder createTableBuffer = new StringBuilder();
 		createTableBuffer.append("CREATE TABLE ");
