@@ -36,6 +36,7 @@ public class DerbyDump {
 			LOGGER.debug("\tschema =" + config.getSchemaName());
 			LOGGER.debug("\tbuffer size =" + config.getBufferMaxSize());
 			LOGGER.debug("\toutput file path =" + config.getOutputFilePath());
+			LOGGER.debug("\ttruncate tables =" + config.getTruncateTables());
 
 			OutputThread output = new OutputThread();
 			Thread writer = new Thread(output, "File_Writer");
