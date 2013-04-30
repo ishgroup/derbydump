@@ -82,8 +82,6 @@ public class BlobDumpTest {
 			String md5ActualDump = DigestUtils.md5Hex(FileUtils.readFileToByteArray(actualDump));
 			String md5ExpectedDump = DigestUtils.md5Hex(FileUtils.readFileToByteArray(expectedDump));
 
-			assertEquals(md5ExpectedDump , md5ActualDump);
-
 			//test below are redundant, but they help to debug problems.
 			List<String> actualLines = FileUtils.readLines(actualDump);
 			List<String> expectedLines = FileUtils.readLines(expectedDump);
@@ -91,9 +89,14 @@ public class BlobDumpTest {
 			assertEquals(expectedLines.size() , actualLines.size());
 
 			for (int i=0;i<actualLines.size();i++) {
-				assertEquals(DigestUtils.md5Hex(expectedLines.get(i)), DigestUtils.md5Hex(actualLines.get(i)));
 				assertEquals(expectedLines.get(i), actualLines.get(i));
+				assertEquals("\n"+expectedLines.get(i)+" vs\n"+ actualLines.get(i),DigestUtils.md5Hex(expectedLines.get(i)), DigestUtils.md5Hex(actualLines.get(i)));
 			}
+
+
+			// this is the most important test
+			assertEquals(md5ExpectedDump , md5ActualDump);
+
 
 		} catch (Exception e) {
 			e.printStackTrace();
