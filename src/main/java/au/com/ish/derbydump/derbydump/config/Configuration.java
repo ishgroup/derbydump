@@ -77,7 +77,7 @@ public class Configuration {
 	public String rewriteTableName(String tableName) {
 		String newName = tableRewriteProp.getProperty(tableName.toLowerCase());
 		if (newName != null) {
-			return newName;
+			return newName.trim();
 		}
 		return tableName;
 	}
@@ -126,7 +126,7 @@ public class Configuration {
 		if (prop.getProperty("dump.buffer.size") == null) {
 			return 8192;
 		}
-		return  Integer.valueOf(prop.getProperty("dump.buffer.size"));
+		return  Integer.valueOf(prop.getProperty("dump.buffer.size").trim());
 	}
 
 	public void setBufferMaxSize(int bufferMaxSize) {
