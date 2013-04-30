@@ -100,6 +100,9 @@ public class DatabaseReader {
 						StringBuilder outputSQL = new StringBuilder();
 
 						outputSQL.append("LOCK TABLES `" + table.getTableName() + "` WRITE;\n");
+						if (config.getTruncateTables()) {
+							outputSQL.append("TRUNCATE TABLE "+ table.getTableName()+";\n");
+						}
 						outputSQL.append(table.getInsertSQL()).append("\n");
 
 						while (dataRows.next()) {
