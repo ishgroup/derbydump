@@ -111,10 +111,12 @@ public class DumpTest {
 			String validOutput3 = "(42,42.00,42.0,42,64),";
 			Object[] row4 = new Object[] {new BigInteger("42"), new BigDecimal("42.1234"), new Float("42.1434"), Integer.valueOf(42), Integer.valueOf(64)};
 			String validOutput4 = "(42,42.12,42.1434,42,64),";
+			Object[] row5 = new Object[] {BigDecimal.ZERO, BigDecimal.ZERO, new Float("0"), Integer.valueOf(0), Integer.valueOf(0)};
+			String validOutput5 = "(0,0.00,0.0,0,0),";
 			//test nulls
-			Object[] row5 = new Object[] {null, null, null, null, null};
-			String validOutput5 = "(NULL,NULL,0.0,NULL,NULL);";
-			Object[] values = new Object[] {row1, row2, row3, row4, row5};
+			Object[] row6 = new Object[] {null, null, null, null, null};
+			String validOutput6 = "(NULL,NULL,NULL,NULL,NULL);";
+			Object[] values = new Object[] {row1, row2, row3, row4, row5, row6};
 			String[] validOutput = new String[] {validOutput1, validOutput2, validOutput3, validOutput4, validOutput5};
 
 			result.add(new Object[] {"testNumbers", null, columns, values, validOutput, false, false});
