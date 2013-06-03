@@ -166,7 +166,8 @@ public class Column {
 			case Types.REAL:
 			case Types.FLOAT: {
 				Float obj = dataRow.getFloat(columnName);
-				return (obj == null) ? "NULL" : String.valueOf(obj);
+				// dataRow.getFloat() always returns a value. only way to check the null is wasNull() method
+				return (dataRow.wasNull()) ? "NULL" : String.valueOf(obj);
 			}
 			
 			case Types.DOUBLE: {
