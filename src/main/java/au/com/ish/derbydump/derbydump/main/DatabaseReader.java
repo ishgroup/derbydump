@@ -97,44 +97,43 @@ public class DatabaseReader {
 					if (dataRows.first()) { // check that we have at least one row
 						dataRows.beforeFirst();
 
-						StringBuilder outputSQL = new StringBuilder();
-
-						outputSQL.append("LOCK TABLES `" + table.getTableName() + "` WRITE;\n");
+						output.add("LOCK TABLES `" + table.getTableName() + "` WRITE;\n");
 						if (config.getTruncateTables()) {
-							outputSQL.append("TRUNCATE TABLE "+ table.getTableName()+";\n");
+							output.add("TRUNCATE TABLE " + table.getTableName() + ";\n");
 						}
-						outputSQL.append(table.getInsertSQL()).append("\n");
+						output.add(table.getInsertSQL());
+						output.add("\n");
 
 						while (dataRows.next()) {
 
-							outputSQL.append("(");
+							output.add("(");
 							
+							boolean firstColumn = true;
 							for (Column column : columns) {
-								outputSQL.append(column.toString(dataRows));
-								outputSQL.append(",");
+								if (firstColumn) {
+									firstColumn = false;
+								} else {
+									output.add(",");
+								}
+								output.add(column.toString(dataRows));
 							}
 							rowCount++;
-							outputSQL.deleteCharAt(outputSQL.length()-1); //remove the last comma
-
-							outputSQL.append(")");
+							output.add(")");
+							
 							
 							if (!dataRows.isLast()) {
 								if (rowCount % MAX_ALLOWED_ROWS == 0) {
-									outputSQL.append(";\n");
-									outputSQL.append(table.getInsertSQL()).append("\n");
+									output.add(";\n");
+									output.add(table.getInsertSQL());
+									output.add("\n");
 								} else {
-									outputSQL.append(",");									
+									output.add(",\n");									
 								}
 							}
-							outputSQL.append("\n");
 						}
 
-						outputSQL.deleteCharAt(outputSQL.length()-1); //remove the last comma
-						outputSQL.append(";\n");
-
-						outputSQL.append("UNLOCK TABLES;\n");
-
-						output.add(outputSQL.toString());
+						output.add(";\n");
+						output.add("UNLOCK TABLES;\n");
 
 						dataRows.close();
 						statement.close();
