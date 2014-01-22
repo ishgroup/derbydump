@@ -99,25 +99,25 @@ public class DumpTest {
 	public static Collection<Object[]> setupTestMatrix() throws Exception {
 		List<Object[]> result = new ArrayList<Object[]>();
 
-		//testing numbers (BIGINT, DECIMAL, REAL, SMALLINT, INTEGER)
+		//testing numbers (BIGINT, DECIMAL, REAL, SMALLINT, INTEGER, DOUBLE)
 		{
 			//standard set of numbers
-			String[] columns = new String[] {"c1 BIGINT", "c2 DECIMAL(10,2)", "c3 REAL", "c4 SMALLINT", "c5 INTEGER"};
-			Object[] row1 = new Object[] {new BigInteger("12"), new BigDecimal("12.12"), new Float("12.1"), Integer.valueOf(12), Integer.valueOf(24)};
-			String validOutput1 = "(12,12.12,12.1,12,24),";
-			Object[] row2 = new Object[] {new BigInteger("42"), new BigDecimal("42.12"), new Float("42.14"), Integer.valueOf(42), Integer.valueOf(64)};
-			String validOutput2 = "(42,42.12,42.14,42,64),";
-			Object[] row3 = new Object[] {new BigInteger("42"), new BigDecimal("42"), new Float("42"), Integer.valueOf(42), Integer.valueOf(64)};
-			String validOutput3 = "(42,42.00,42.0,42,64),";
-			Object[] row4 = new Object[] {new BigInteger("42"), new BigDecimal("42.1234"), new Float("42.1434"), Integer.valueOf(42), Integer.valueOf(64)};
-			String validOutput4 = "(42,42.12,42.1434,42,64),";
-			Object[] row5 = new Object[] {BigDecimal.ZERO, BigDecimal.ZERO, new Float("0"), Integer.valueOf(0), Integer.valueOf(0)};
-			String validOutput5 = "(0,0.00,0.0,0,0),";
+			String[] columns = new String[] {"c1 BIGINT", "c2 DECIMAL(10,2)", "c3 REAL", "c4 SMALLINT", "c5 INTEGER", "c6 DOUBLE"};
+			Object[] row1 = new Object[] {new BigInteger("12"), new BigDecimal("12.12"), new Float("12.1"), Integer.valueOf(12), Integer.valueOf(24), Double.valueOf(12.12)};
+			String validOutput1 = "(12,12.12,12.1,12,24,12.12),";
+			Object[] row2 = new Object[] {new BigInteger("42"), new BigDecimal("42.12"), new Float("42.14"), Integer.valueOf(42), Integer.valueOf(64), Double.valueOf(42.14)};
+			String validOutput2 = "(42,42.12,42.14,42,64,42.14),";
+			Object[] row3 = new Object[] {new BigInteger("42"), new BigDecimal("42"), new Float("42"), Integer.valueOf(42), Integer.valueOf(64), Double.valueOf(42)};
+			String validOutput3 = "(42,42.00,42.0,42,64,42.0),";
+			Object[] row4 = new Object[] {new BigInteger("42"), new BigDecimal("42.1234"), new Float("42.1434"), Integer.valueOf(42), Integer.valueOf(64), Double.valueOf(42.1234)};
+			String validOutput4 = "(42,42.12,42.1434,42,64,42.1234),";
+			Object[] row5 = new Object[] {BigDecimal.ZERO, BigDecimal.ZERO, new Float("0"), Integer.valueOf(0), Integer.valueOf(0), Double.valueOf(0)};
+			String validOutput5 = "(0,0.00,0.0,0,0,0.0),";
 			//test nulls
-			Object[] row6 = new Object[] {null, null, null, null, null};
-			String validOutput6 = "(NULL,NULL,NULL,NULL,NULL);";
+			Object[] row6 = new Object[] {null, null, null, null, null, null};
+			String validOutput6 = "(NULL,NULL,NULL,NULL,NULL,NULL);";
 			Object[] values = new Object[] {row1, row2, row3, row4, row5, row6};
-			String[] validOutput = new String[] {validOutput1, validOutput2, validOutput3, validOutput4, validOutput5};
+			String[] validOutput = new String[] {validOutput1, validOutput2, validOutput3, validOutput4, validOutput5, validOutput6};
 
 			result.add(new Object[] {"testNumbers", null, columns, values, validOutput, false, false});
 		}
