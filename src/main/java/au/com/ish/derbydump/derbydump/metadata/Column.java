@@ -172,7 +172,7 @@ public class Column {
 			
 			case Types.DOUBLE: {
 				Double obj = dataRow.getDouble(columnName);
-				return (obj == null) ? "NULL" : String.valueOf(obj);
+				return (dataRow.wasNull()) ? "NULL" : String.valueOf(obj);
 			}
 			
 			default: {
