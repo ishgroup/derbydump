@@ -10,7 +10,7 @@ sourceCompatibility = 1.6
 targetCompatibility = 1.6
 
 repositories {
-  mavenRepo url: "http://repo.maven.apache.org/maven2"
+  mavenCentral()
 }
 
 dependencies {
@@ -36,4 +36,8 @@ test {
     // log each starting test
       beforeTest { descriptor -> logger.lifecycle("Running: " + descriptor)
       }
-  }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.10'
+}
