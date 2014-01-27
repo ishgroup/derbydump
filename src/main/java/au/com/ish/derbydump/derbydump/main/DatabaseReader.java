@@ -73,11 +73,12 @@ public class DatabaseReader {
 	}
 
 	/**
-	 * Read data from every {@link Table} present in the database and add it to
+	 * Read data from each {@link Table} and add it to
 	 * the output.
 	 * 
-	 * @param tables
-	 * @param connection
+	 * @param tables A list of tables to read from
+	 * @param connection The database connection used to fetch the data
+	 * @param schema The name of the schema we are using
 	 */
 	private void getInternalData(List<Table> tables, Connection connection, String schema) {
 		LOGGER.debug("Fetching database data...");

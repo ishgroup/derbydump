@@ -41,14 +41,6 @@ public class Column {
 	 * Data type of the column
 	 */
 	private int columnDataType;
-	/**
-	 * Constraint type of a column(if any).
-	 */
-	private String constraintType;
-	/**
-	 * Name of java class which represents the data type of the column
-	 */
-	private String javaClassName;
 	
 	/**
 	 * @return the columnName
@@ -74,35 +66,11 @@ public class Column {
 	public void setColumnDataType(int columnDataType) {
 		this.columnDataType = columnDataType;
 	}
-	/**
-	 * @return the constraintType
-	 */
-	public String getConstraintType() {
-		return constraintType;
-	}
-	/**
-	 * @param constraintType the constraintType to set
-	 */
-	public void setConstraintType(String constraintType) {
-		this.constraintType = constraintType;
-	}
-	/**
-	 * @return the javaClassName
-	 */
-	public String getJavaClassName() {
-		return javaClassName;
-	}
-	/**
-	 * @param javaClassName the javaClassName to set
-	 */
-	public void setJavaClassName(String javaClassName) {
-		this.javaClassName = javaClassName;
-	}
-
+	
 	/**
 	 * Get a string value for the value in this column in the datarow
 	 * 
-	 * @param dataRow
+	 * @param dataRow The row which we are exporting
 	 * @return an SQL statement compliant string version of the value
 	 */
 	public String toString(ResultSet dataRow) throws SQLException {
@@ -196,7 +164,7 @@ public class Column {
 	 and many others, there is no safer way of exporting blobs than separate data files or hex format.<br/>
 	 tested, mysql detects and imports hex encoded fields automatically.
 
-	 * @param blob
+	 * @param blob Blob which we will convert to hex encoded string
 	 * @return String representation of binary data
 	 */
 	public static String processBinaryData(Blob blob) throws SQLException {
@@ -213,10 +181,10 @@ public class Column {
 	}
 
 	/**
-	 * @param data
+	 * @param data Clob to process and encode
 	 * @return String representation of Clob.
 	 */
-	public static String processClobData(Clob data) {
+	static String processClobData(Clob data) {
 		if (data == null)
 			return "NULL";
 
@@ -239,7 +207,7 @@ public class Column {
 	}
 
 	/**
-	 * @param data
+	 * @param data String to process
 	 * @return String representation of string data after escaping.
 	 */
 	private static String processStringData(String data) {
@@ -252,11 +220,11 @@ public class Column {
 	/**
 	 * Escapes sql special characters
 	 *
-	 * @param raw
+	 * @param raw String value which will be processed and escaped
 	 *
 	 * @return Escaped query
 	 */
-	public static String escapeQuotes(String raw) {
+	static String escapeQuotes(String raw) {
 		String output;
 		
 		// Replace "\" with "\\"
