@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'maven'
 
 group = 'au.com.ish'
-description = "derbydump"
+description = 'derbydump'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
@@ -20,7 +20,7 @@ dependencies {
   testCompile 'junit:junit:4.11'
 }
 
-version = 1.1-SNAPSHOT
+version = '1.1-SNAPSHOT'
 
 [ compileJava, compileTestJava ]*.options*.encoding = 'UTF-8'
 
