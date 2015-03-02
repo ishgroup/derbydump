@@ -63,6 +63,8 @@ public class Configuration {
 		stringBuilder.append(";create=false;");
 		stringBuilder.append("user=").append(getUserName()).append(";");
 		stringBuilder.append("password=").append(getPassword()).append(";");
+		stringBuilder.append("bootPassword=").append(getBootPassword()).append(";");
+		
 
 		return stringBuilder.toString();
 	}
@@ -95,6 +97,14 @@ public class Configuration {
 
 	public void setPassword(String password) {
 		prop.setProperty("db.password", password);
+	}
+
+	public String getBootPassword() {
+		return prop.getProperty("db.bootPassword");
+	}
+
+	public void setBootPassword(String bootPassword) {
+		prop.setProperty("db.bootPassword", bootPassword);
 	}
 
 	public String getDriverClassName() {

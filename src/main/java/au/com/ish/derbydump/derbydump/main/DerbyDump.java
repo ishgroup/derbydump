@@ -31,6 +31,7 @@ public class DerbyDump {
 			LOGGER.debug("Configuration:");
 			LOGGER.debug("\tuser =" + config.getUserName());
 			LOGGER.debug("\tpassword =" + config.getPassword());
+			LOGGER.debug("\tbootPassword =" + config.getBootPassword());
 			LOGGER.debug("\tderbyDbPath =" + config.getDerbyDbPath());
 			LOGGER.debug("\tdriverName =" + config.getDriverClassName());
 			LOGGER.debug("\tschema =" + config.getSchemaName());

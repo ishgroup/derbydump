@@ -18,7 +18,7 @@ db.derbyDbPath = ~/databaseFolder
 db.schemaName = databaseName
 db.userName = root
 db.password = secret!
-
+db.bootPassword = topsecret!
 
 ## Internal options ##
 # buffer size in kB. Must be larger than the largest row. defaults to 8912
