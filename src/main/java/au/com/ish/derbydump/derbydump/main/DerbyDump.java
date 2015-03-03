@@ -26,7 +26,7 @@ public class DerbyDump {
 	
 	public static void main(String[] args) {
 
-			Configuration config = Configuration.getConfiguration();
+			Configuration config = Configuration.getConfiguration(args[0]);
 
 			LOGGER.debug("Configuration:");
 			LOGGER.debug("\tuser =" + config.getUserName());
