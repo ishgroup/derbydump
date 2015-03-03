@@ -17,6 +17,9 @@
 package au.com.ish.derbydump.derbydump.config;
 
 import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -28,6 +31,7 @@ public class Configuration {
 	private static Configuration configuration;
 	private Properties prop = new Properties();
 	private Properties tableRewriteProp = new Properties();
+	private List<String> tableNames = new ArrayList<String>();
 
 	private Configuration(String configurationFile) {
 		try {
@@ -43,6 +47,11 @@ public class Configuration {
 					// put a copy of every entry into the properties as lowercase for case-insensitive matching later
 					tableRewriteProp.setProperty(entry.toLowerCase(), tableRewriteProp.getProperty(entry));
 				}
+			}
+
+			String tablesProp = prop.getProperty("db.tableNames");
+			if (tablesProp != null) {
+				tableNames = Arrays.asList(tablesProp.split(","));
 			}
 
 		} catch (Exception ignored) {}
@@ -171,5 +180,13 @@ public class Configuration {
 			return false;
 		}
 		return  Boolean.valueOf(prop.getProperty("output.truncateTables").trim());
+	}
+
+	public List<String> getTableNames() {
+		return tableNames;
+	}
+
+	public void setTableNames(List<String> tableNames) {
+		this.tableNames = tableNames;
 	}
 }

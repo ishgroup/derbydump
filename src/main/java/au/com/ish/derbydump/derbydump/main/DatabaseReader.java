@@ -16,18 +16,20 @@
 
 package au.com.ish.derbydump.derbydump.main;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+
 import au.com.ish.derbydump.derbydump.config.Configuration;
 import au.com.ish.derbydump.derbydump.config.DBConnectionManager;
 import au.com.ish.derbydump.derbydump.metadata.Column;
 import au.com.ish.derbydump.derbydump.metadata.Database;
 import au.com.ish.derbydump.derbydump.metadata.Table;
-import org.apache.log4j.Logger;
-
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
 
 /**
  * Logical module representing a reader/producer which reads from a database and
@@ -62,7 +64,7 @@ public class DatabaseReader {
 		MetadataReader metadata = new MetadataReader();
 		LOGGER.debug("Resolving database structure...");
 		Database database = metadata.readDatabase(db.getConnection());
-		getInternalData(database.getTables(), db.getConnection(), schema);
+		getInternalData(getOrderedSubSet(database.getTables()), db.getConnection(), schema);
 
 		try {
 			db.getConnection().close();
@@ -70,6 +72,18 @@ public class DatabaseReader {
 			LOGGER.error("Could not close database connection :" + e.getErrorCode() + " - " + e.getMessage());
 		}
 
+	}
+
+	private List<Table> getOrderedSubSet(List<Table> tables) {
+		List<String> tableNames = config.getTableNames();
+		List<Table> toReturn = new ArrayList<Table>(tableNames.size());
+		for (Table table : tables) {
+			if (tableNames.contains(table.getTableName())) {
+				int index = tableNames.indexOf(table.getTableName());
+				toReturn.add(index, table);
+			}
+		}
+		return toReturn;
 	}
 
 	/**
