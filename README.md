@@ -20,7 +20,7 @@ Derby SQL dump. This project will take a Derby database and export the data in i
 4. # cp derbydump.properties.sample derbydump.properties
 5. Edit derbydump.properties for your needs
 6. # ./gradlew jar
-7. # java -jar build/libs/derbydump-*.jar
+7. # java -jar build/libs/derbydump-*.jar derbydump.properties
 
 
 ## Continuous integration testing
