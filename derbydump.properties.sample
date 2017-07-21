@@ -18,7 +18,9 @@ db.derbyDbPath = ~/databaseFolder
 db.schemaName = databaseName
 db.userName = root
 db.password = secret!
-
+db.bootPassword = topsecret!
+# Names of tables ordered to ensure the constraints validity
+db.tableNames = BYTE_FILE,PROGRAM,PROGRAM_OS_VERSION,DOMAIN_REF,SECURITYGROUP_REF,SOLUTION,SOLUTION_PROGRAM,PACKAGED_SOLUTION,APPLICATION_DOMAIN,APP_ACCESS_RIGHT,ACCESSRIGHT_PROGRAM,PACKAGED_SOLUTION_BYTE_FILE,PARAMETER,ACL
 
 ## Internal options ##
 # buffer size in kB. Must be larger than the largest row. defaults to 8912

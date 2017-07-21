@@ -17,6 +17,9 @@
 package au.com.ish.derbydump.derbydump.config;
 
 import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -28,10 +31,11 @@ public class Configuration {
 	private static Configuration configuration;
 	private Properties prop = new Properties();
 	private Properties tableRewriteProp = new Properties();
+	private List<String> tableNames = new ArrayList<String>();
 
-	private Configuration() {
+	private Configuration(String configurationFile) {
 		try {
-			FileInputStream file = new FileInputStream("derbydump.properties");
+			FileInputStream file = new FileInputStream(configurationFile);
 			prop.load(file);
 			file.close();
 
@@ -45,14 +49,23 @@ public class Configuration {
 				}
 			}
 
+			String tablesProp = prop.getProperty("db.tableNames");
+			if (tablesProp != null) {
+				tableNames = Arrays.asList(tablesProp.split(","));
+			}
+
 		} catch (Exception ignored) {}
 
 	}
 
-	public static synchronized Configuration getConfiguration() {
+	public static synchronized Configuration getConfiguration(String configurationFile) {
 		if (configuration == null) {
-			configuration = new Configuration();
+			configuration = new Configuration(configurationFile);
 		}
+		return configuration;
+	}
+	
+	public static synchronized Configuration getConfiguration() {
 		return configuration;
 	}
 
@@ -63,6 +76,8 @@ public class Configuration {
 		stringBuilder.append(";create=false;");
 		stringBuilder.append("user=").append(getUserName()).append(";");
 		stringBuilder.append("password=").append(getPassword()).append(";");
+		stringBuilder.append("bootPassword=").append(getBootPassword()).append(";");
+		
 
 		return stringBuilder.toString();
 	}
@@ -95,6 +110,14 @@ public class Configuration {
 
 	public void setPassword(String password) {
 		prop.setProperty("db.password", password);
+	}
+
+	public String getBootPassword() {
+		return prop.getProperty("db.bootPassword");
+	}
+
+	public void setBootPassword(String bootPassword) {
+		prop.setProperty("db.bootPassword", bootPassword);
 	}
 
 	public String getDriverClassName() {
@@ -157,5 +180,13 @@ public class Configuration {
 			return false;
 		}
 		return  Boolean.valueOf(prop.getProperty("output.truncateTables").trim());
+	}
+
+	public List<String> getTableNames() {
+		return tableNames;
+	}
+
+	public void setTableNames(List<String> tableNames) {
+		this.tableNames = tableNames;
 	}
 }
